@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'calendar.dart';
+import 'weather.dart';
+import 'feeds.dart';
+import 'settings.dart';
 
 
 void main() => runApp(const MyApp());
@@ -34,19 +37,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    Calendar(),
-    Text(
-      'Index 1: Weather',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: Feed',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 3: Settings',
-      style: optionStyle,
-    ),
+    const DateWidget(),
+    Weather(),
+    Feeds(),
+    const FavoriteWidget(),
   ];
 
   void _onItemTapped(int index) {
