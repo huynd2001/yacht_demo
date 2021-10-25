@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:yacht_demo/datetime_picker.dart';
 
 class EventItem {
@@ -101,6 +102,7 @@ class CalendarDisplay extends State<DateWidget> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
+
                       content: Stack(
                         children: <Widget>[
                           Form(
@@ -131,18 +133,91 @@ class CalendarDisplay extends State<DateWidget> {
                                   child: Row(
                                     children: <Widget>[
                                       Container(
-                                        width: 300,
-                                        child: DatetimePickerWidget()
-                                      )
-                                      ,
-                                      // InputDatePickerFormField(
-                                      //   firstDate: _dateList.first.startTime,
-                                      //   lastDate: _dateList.last.endTime,
-                                      //   onDateSaved: (value) {
-                                      //     this.formEndTime = value;
-                                      //   },
-                                      // )
+                                        child: ElevatedButton(
+                                          onPressed: ()  {
+                                              showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0),
+                                              lastDate: DateTime.now().add(Duration(days: 7)),
+                                              firstDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0),
+                                              ).then((value) => {
+
+                                                setState(() {
+                                                  formStartTime = value ?? DateTime.now();
+                                                }),
+                                                print(formStartTime),
+                                              });
+                                          },
+                                          child: Text('Start Date'),
+                                        ),
+                                      ),
+                                      Container(
+                                        child: ElevatedButton(
+                                          onPressed: ()  {
+                                            showTimePicker(
+                                              context: context,
+                                              initialTime: TimeOfDay(hour: 0, minute: 0)
+                                              ).then((value) => {
+
+                                              setState(() {
+                                                TimeOfDay time = value ?? TimeOfDay.now();
+                                                formStartTime =
+                                                    new DateTime(formStartTime.year, formStartTime.month, formStartTime.day,
+                                                    time.hour, time.minute);
+                                              }),
+                                              print(formStartTime),
+                                            });
+                                          },
+                                          child: Text('Start Time'),
+                                        ),
+                                      ),
                                     ]
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Row(
+                                      children: <Widget>[
+                                        Container(
+                                          child: ElevatedButton(
+                                            onPressed: ()  {
+                                              showDatePicker(
+                                                context: context,
+                                                initialDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0),
+                                                lastDate: DateTime.now().add(Duration(days: 7)),
+                                                firstDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0),
+                                              ).then((value) => {
+
+                                                setState(() {
+                                                  formEndTime = value ?? DateTime.now();
+                                                }),
+                                                print(formEndTime),
+                                              });
+                                            },
+                                            child: Text('End Date'),
+                                          ),
+                                        ),
+                                        Container(
+                                          child: ElevatedButton(
+                                            onPressed: ()  {
+                                              showTimePicker(
+                                                  context: context,
+                                                  initialTime: TimeOfDay(hour: 0, minute: 0)
+                                              ).then((value) => {
+
+                                                setState(() {
+                                                  TimeOfDay time = value ?? TimeOfDay.now();
+                                                  formEndTime =
+                                                  new DateTime(formEndTime.year, formEndTime.month, formEndTime.day,
+                                                      time.hour, time.minute);
+                                                }),
+                                                print(formEndTime),
+                                              });
+                                            },
+                                            child: Text('End Time'),
+                                          ),
+                                        ),
+                                      ]
                                   ),
                                 ),
                                 Padding(
@@ -152,6 +227,10 @@ class CalendarDisplay extends State<DateWidget> {
                                     onPressed: () {
                                       if (_formKey.currentState!.validate()) {
                                         _formKey.currentState!.save();
+                                        print(this.formTaskName);
+                                        print(this.formStartTime);
+                                        print(this.formEndTime);
+                                        addEvent(EventItem(formStartTime, formEndTime, formTaskName));
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text('Event Added!')),
                                         );
