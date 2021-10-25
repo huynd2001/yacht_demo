@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:yacht_demo/datetime_picker.dart';
 
 class EventItem {
 
@@ -131,13 +132,7 @@ class CalendarDisplay extends State<DateWidget> {
                                     children: <Widget>[
                                       Container(
                                         width: 300,
-                                        child: InputDatePickerFormField(
-                                          firstDate: _dateList.first.startTime,
-                                          lastDate: _dateList.last.endTime,
-                                          onDateSaved: (value) {
-                                            this.formStartTime = value;
-                                          },
-                                        )
+                                        child: DatetimePickerWidget()
                                       )
                                       ,
                                       // InputDatePickerFormField(
