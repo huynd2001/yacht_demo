@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'calendar.dart';
 import 'weather.dart';
-import 'feeds.dart';
 import 'settings.dart';
-
 
 void main() => runApp(const MyApp());
 
@@ -36,11 +34,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    const DateWidget(),
-    Weather(),
-    Feeds(),
-    const FavoriteWidget(),
+  static List<Widget> _widgetOptions = <Widget>[
+    Text('Clippy Placeholder'),
+    Column(
+      children: <Widget>[DateWidget(), WeatherWidget()],
+    ),
+    SettingWidget(),
   ];
 
   void _onItemTapped(int index) {
@@ -61,16 +60,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+              icon: Icon(Icons.alternate_email),
+            label: 'Clippy',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.wb_sunny_outlined),
-            label: 'Weather',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.padding),
-            label: 'Feeds',
+            label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),

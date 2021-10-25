@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class FavoriteWidget extends StatefulWidget {
-  const FavoriteWidget({Key? key}) : super(key: key);
+class SettingWidget extends StatefulWidget {
+  const SettingWidget({Key? key}) : super(key: key);
 
   @override
   Settings createState() => Settings();
 }
 
-class Settings extends State<FavoriteWidget> {
+class Settings extends State<SettingWidget> {
 
   SavedSettings settings = new SavedSettings(true, true);
 
