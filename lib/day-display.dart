@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
+import 'package:infinite_listview/infinite_listview.dart';
 
 import 'calendar.dart';
 
@@ -63,7 +64,12 @@ class EventInDaysDisplay extends StatelessWidget {
   }
 }
 
-class DayDisplay extends StatelessWidget {
+class DayDisplay extends StatefulWidget {
+  @override
+  _DayDisplayState createState() => _DayDisplayState();
+}
+
+class _DayDisplayState extends State<DayDisplay> {
   DateTime getToday() => new DateTime(
       DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
 
@@ -72,7 +78,7 @@ class DayDisplay extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.blue, title: const Text('Date View')),
-        body: ListView.builder(
+        body: InfiniteListView.builder(
             itemBuilder: (_, index) {
               DateTime startTime = getToday().add(Duration(days: index));
               DateTime endTime = startTime.add(Duration(days: 1));
