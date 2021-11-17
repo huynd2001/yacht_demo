@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yacht_demo/services/event-retriever.dart';
 
 class EventItem {
   final DateTime startTime;
@@ -37,22 +38,7 @@ class DateWidget extends StatefulWidget {
   CalendarDisplay createState() => CalendarDisplay();
 }
 
-class WeekDay {
-  static List<String> weekDayStrings = [
-    "MON",
-    "TUE",
-    "WED",
-    "THU",
-    "FRI",
-    "SAT",
-    "SUN"
-  ];
-}
-
 class CalendarDisplay extends State<DateWidget> {
-  List<DateItem> _dateList = newList();
-  List<EventItem> _eventList = List.empty(growable: true);
-
   String formTaskName = "";
   DateTime formStartTime = DateTime.now();
   DateTime formEndTime = DateTime.now();
@@ -60,13 +46,10 @@ class CalendarDisplay extends State<DateWidget> {
   final _formKey = GlobalKey<FormState>();
 
   static List<DateItem> newList() {
-    DateTime today = new DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
-
     return List.generate(
             7,
-            (index) =>
-                today.add(new Duration(hours: Duration.hoursPerDay * index)))
+            (index) => EventRetriever.today()
+                .add(new Duration(hours: Duration.hoursPerDay * index)))
         .map((d) =>
             DateItem(d, d.add(new Duration(hours: Duration.hoursPerDay))))
         .toList();
@@ -74,46 +57,47 @@ class CalendarDisplay extends State<DateWidget> {
 
   void addEvent(EventItem e) {
     setState(() {
-      _eventList.add(e);
+      EventRetriever.addEvent(e);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> widgets = _dateList
-        .map((d) => Card(
-                child: Container(
-              width: 80,
-              height: 100,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                      ListTile(
-                        title: Text(d.startTime.day.toString() +
-                            '-' +
-                            d.startTime.month.toString()),
-                        subtitle: Text(
-                            WeekDay.weekDayStrings[d.startTime.weekday - 1]),
-                      )
-                    ] +
-                    _eventList
-                        .where((e) => d.startTime.isBefore(e.startTime))
-                        .where((e) => d.endTime.isAfter(e.startTime))
-                        .map((e) => Text(e.task))
-                        .toList(),
-              ),
-            )))
-        .cast<Widget>()
-        .toList();
-
     return Column(children: <Widget>[
       Container(
         height: 200,
-        child: ListView(
+        child: ListView.builder(
+            itemBuilder: (_, index) {
+              DateTime startTime =
+                  EventRetriever.today().add(Duration(days: index));
+              DateTime endTime = startTime.add(Duration(days: 1));
+
+              return Card(
+                  child: Container(
+                width: 80,
+                height: 100,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                        ListTile(
+                            title: Text(startTime.day.toString() +
+                                '-' +
+                                startTime.month.toString()),
+                            subtitle: Text(
+                              DateFormat('EEE').format(startTime),
+                            ))
+                      ] +
+                      EventRetriever.retrieveEventFromStartEnd(
+                              startTime, endTime)
+                          .map((e) => Text(e.task))
+                          .take(4)
+                          .toList(),
+                ),
+              ));
+            },
             shrinkWrap: true,
             padding: const EdgeInsets.all(20.0),
-            scrollDirection: Axis.horizontal,
-            children: widgets),
+            scrollDirection: Axis.horizontal),
       ),
       ElevatedButton(
           onPressed: () {

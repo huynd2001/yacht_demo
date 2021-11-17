@@ -70,9 +70,6 @@ class DayDisplay extends StatefulWidget {
 }
 
 class _DayDisplayState extends State<DayDisplay> {
-  DateTime getToday() => new DateTime(
-      DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,7 +77,8 @@ class _DayDisplayState extends State<DayDisplay> {
             backgroundColor: Colors.blue, title: const Text('Date View')),
         body: InfiniteListView.builder(
             itemBuilder: (_, index) {
-              DateTime startTime = getToday().add(Duration(days: index));
+              DateTime startTime =
+                  EventRetriever.today().add(Duration(days: index));
               DateTime endTime = startTime.add(Duration(days: 1));
               return EventInDaysDisplay(begin: startTime, end: endTime);
             },
