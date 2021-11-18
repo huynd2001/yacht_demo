@@ -72,6 +72,10 @@ class EventInDaysDisplay extends StatelessWidget {
 }
 
 class DayDisplay extends StatefulWidget {
+  final DateTime startDate;
+
+  const DayDisplay({Key? key, required this.startDate}) : super(key: key);
+
   @override
   _DayDisplayState createState() => _DayDisplayState();
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:infinite_listview/infinite_listview.dart';
 import 'package:intl/intl.dart';
 import 'package:yacht_demo/day-display.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
@@ -67,7 +68,7 @@ class CalendarDisplay extends State<DateWidget> {
     return Column(children: <Widget>[
       Container(
         height: 200,
-        child: ListView.builder(
+        child: InfiniteListView.builder(
           itemBuilder: (_, index) {
             DateTime startTime =
                 EventRetriever.today().add(Duration(days: index));
@@ -76,7 +77,10 @@ class CalendarDisplay extends State<DateWidget> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => DayDisplay()),
+                  MaterialPageRoute(
+                      builder: (_) => DayDisplay(
+                            startDate: EventRetriever.today(),
+                          )),
                 );
               },
               child: Card(
@@ -102,8 +106,6 @@ class CalendarDisplay extends State<DateWidget> {
               ),
             );
           },
-          shrinkWrap: true,
-          padding: const EdgeInsets.all(20.0),
           scrollDirection: Axis.horizontal,
           addAutomaticKeepAlives: false,
         ),
