@@ -1,5 +1,6 @@
 package com.csds393.yacht.weather
 
+import androidx.room.Ignore
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import java.net.*
@@ -61,7 +62,7 @@ data class HalfDayWeather(
     val shortForecast: String,
     val detailedForecast: String,
 ) {
-
+    @delegate: Ignore
     val windSpeedRange: IntRange by lazy {
         val matcher = numberPattern.matcher(windSpeed)
         matcher.find()
@@ -69,10 +70,11 @@ data class HalfDayWeather(
         val end = if (matcher.find()) Integer.parseInt(matcher.group()) else start
         IntRange(start, end)
     }
-
+    @delegate: Ignore
     val zonedDateTime: ZonedDateTime by lazy { ZonedDateTime.parse(zonedDateTimeString) }
 
     // TODO: 10/25/2021  more sophisticated sky field and parsing
+    @delegate: Ignore
     val sky: Sky by lazy {
         when {
             shortForecast.contains("Sunny") -> Sky.SUNNY
@@ -87,6 +89,7 @@ data class HalfDayWeather(
     }
 }
 
+data class DayWeather(val morningWeather: HalfDayWeather, val nightWeather: HalfDayWeather)
 
 // TODO: 10/24/2021  refactor, perhaps compose Forecast from Likelihood+Condition + optional then Forecast
 enum class Sky {

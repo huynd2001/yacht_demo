@@ -2,9 +2,9 @@ package com.csds393.yacht_demo;
 
 import androidx.annotation.NonNull;
 
-import java.util.HashMap;
+import java.util.*;
 
-import com.csds393.yacht.calendar.Calendar;
+import com.csds393.yacht.database.*;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
@@ -20,7 +20,14 @@ public class MainActivity extends FlutterActivity {
             (call, result) -> {
                 switch(call.method) {
                     case "getWeather":
-                        result.success(new HashMap<String, String>());
+                        String start = call.argument("start");
+                        String end = call.argument("end");
+
+                        Map<String, String> returnValue = new HashMap<>();
+                        returnValue.put("this", start);
+                        returnValue.put("a", end);
+
+                        result.success(returnValue);
                         break;
                     default:
                         ;

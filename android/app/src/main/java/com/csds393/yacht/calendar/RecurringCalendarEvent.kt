@@ -1,5 +1,7 @@
 package com.csds393.yacht.calendar
 
+import androidx.room.*
+import androidx.room.ForeignKey.CASCADE
 import java.time.*
 
 /**
@@ -8,24 +10,26 @@ import java.time.*
  * Currently only supports events separated by a whole number of days.
  * @property activeWindow  the window of time when this event re-occurs
  */
-//  could serialize datePattern to 64bit long. 4 bits for type, 8 bits for first second third fields
-// or database side is normalized, wrapped into unified object when given to frontend
+@Entity(tableName = "recurring_events")
 data class RecurringCalendarEvent(
-    private val eventBase: CalendarEvent,
-    private val activeWindow: ClosedRange<LocalDate>,
-    private val datePattern: DatePattern,
+    @Embedded
+    val eventBase: CalendarEvent,
+    val activeWindow: ClosedRange<LocalDate>,
+    val datePattern: DatePattern,
+    @PrimaryKey(autoGenerate = true)
+    val rec_id: Int? = null,
 ) {
-
+    @delegate:Ignore
     private val duration: Period by lazy { with(eventBase) { startDate.until(endDate) } }
 
-    val details: CalendarEvent.Details
-        get() = eventBase.details
-
+    fun details(): CalendarEvent.Details = eventBase.details
 
     /** Generates the list of occurrences of this recurring event that occur in [window] */
-    fun generateEventsBetween(window: ClosedRange<LocalDate>) =
+    fun generateEventsBetween(window: ClosedRange<LocalDate>, exceptions: Collection<LocalDate> = setOf()) =
         datePattern.getOccurrencesInWindows(window, activeWindow)
-            .map { eventBase.copy(startDate = it, endDate = it.plus(duration)) }
+            .filterNot { it in exceptions }
+                // negative id to distinguish from normal events' ids
+            .map { eventBase.copy(startDate = it, endDate = it.plus(duration), id = -rec_id!!) }
 
     /** Returns whether at least one instance of this recurring event occurs in [window] */
     fun occursWithinWindow(window: ClosedRange<LocalDate>): Boolean {
@@ -34,4 +38,19 @@ data class RecurringCalendarEvent(
         val latestDate = minOf(window.endInclusive, activeWindow.endInclusive)
         return !soonestDate.isAfter(latestDate)
     }
+    @Entity(
+        tableName = "recurrence_exceptions",
+        primaryKeys = ["date", "event_id"],
+//        TODO refactor s.t. foreign-key constraint is upheld
+//        foreignKeys = [ForeignKey(
+//            entity = RecurringCalendarEvent::class,
+//            parentColumns = ["id"],
+//            childColumns = ["event_id"],
+//            onUpdate = CASCADE,
+//            onDelete = CASCADE,
+//        )]
+    )
+    /** An excluded [date] for a recurring event */
+    data class Exception(val date: LocalDate, val event_id: Int)
+
 }
