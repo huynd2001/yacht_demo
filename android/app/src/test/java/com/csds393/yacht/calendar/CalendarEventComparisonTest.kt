@@ -27,7 +27,7 @@ class CalendarEventComparisonTest {
      * CalendarEvent
      * Earlier [startDate],
      * Absent [startTime] > earlier [startTime],
-     * Absent [endDate] > earlier [endDate],
+     * Earlier [endDate],
      * Earlier [endTime] > absent [endTime],
      * Compare [details]
      */
@@ -66,15 +66,8 @@ class CalendarEventComparisonTest {
     }
 
     @Test
-    fun `compareTo absent endDate lesser than present`() {
-        eventB = eventA.copy(endDate = null)
-        val compareResult = eventA.compareTo(eventB)
-        assertTrue(0 < compareResult)
-    }
-
-    @Test
     fun `compareTo earlier endDate`() {
-        eventB = eventA.copy(endDate = eventA.endDate!!.plusDays(1))
+        eventB = eventA.copy(endDate = eventA.endDate.plusDays(1))
         val compareResult = eventA.compareTo(eventB)
         assertTrue(compareResult < 0)
     }
@@ -89,6 +82,13 @@ class CalendarEventComparisonTest {
     @Test
     fun `compareTo earlier endTime`() {
         eventB = eventA.copy(endTime = eventA.endTime!!.plusSeconds(1))
+        val compareResult = eventA.compareTo(eventB)
+        assertTrue(compareResult < 0)
+    }
+
+    @Test
+    fun `compareTo lesser Details`() {
+        eventB = eventA.copy(details = eventA.details.copy(label = eventA.details.label + "z"))
         val compareResult = eventA.compareTo(eventB)
         assertTrue(compareResult < 0)
     }

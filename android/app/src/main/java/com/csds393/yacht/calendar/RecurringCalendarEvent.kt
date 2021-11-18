@@ -8,43 +8,30 @@ import java.time.*
  * Currently only supports events separated by a whole number of days.
  * @property activeWindow  the window of time when this event re-occurs
  */
+//  could serialize datePattern to 64bit long. 4 bits for type, 8 bits for first second third fields
+// or database side is normalized, wrapped into unified object when given to frontend
 data class RecurringCalendarEvent(
     private val eventBase: CalendarEvent,
     private val activeWindow: ClosedRange<LocalDate>,
     private val datePattern: DatePattern,
 ) {
 
-    private val duration: Period? = with(eventBase) { endDate?.until(startDate)?.negated() }
+    private val duration: Period by lazy { with(eventBase) { startDate.until(endDate) } }
 
     val details: CalendarEvent.Details
         get() = eventBase.details
 
 
     /** Generates the list of occurrences of this recurring event that occur in [window] */
-    fun generateEventsBetween(window: ClosedRange<LocalDate>): List<CalendarEvent> {
-        // get first occurrence, while still in window, generate
-        var nextOccurrence = earliestMutualFitWith(window.start)
-        val endDate = minOf(window.endInclusive, activeWindow.endInclusive)
-        val generatedEvents = mutableListOf<CalendarEvent>()
-        while (! nextOccurrence.isAfter(endDate)) {
-            generatedEvents.add(eventBase.copy(
-                startDate = nextOccurrence,
-                endDate = duration?.let { nextOccurrence.plus(duration) },
-            ))
-            nextOccurrence = datePattern.nextOccurrenceAfter(nextOccurrence)
-        }
-        return generatedEvents
-    }
+    fun generateEventsBetween(window: ClosedRange<LocalDate>) =
+        datePattern.getOccurrencesInWindows(window, activeWindow)
+            .map { eventBase.copy(startDate = it, endDate = it.plus(duration)) }
 
-    /** Returns whether at least instance of this recurring event occurs in [window] */
+    /** Returns whether at least one instance of this recurring event occurs in [window] */
     fun occursWithinWindow(window: ClosedRange<LocalDate>): Boolean {
-        // Soonest occurrence after both window's start
-        val soonestDate = earliestMutualFitWith(window.start)
-        // is it <= both ends
-        return !soonestDate.isAfter(minOf(window.endInclusive, activeWindow.endInclusive))
+        // Strict lower-bound of soonest occurrence
+        val soonestDate = datePattern.nextOccurrenceFrom(maxOf(window.start, activeWindow.start))
+        val latestDate = minOf(window.endInclusive, activeWindow.endInclusive)
+        return !soonestDate.isAfter(latestDate)
     }
-
-    /** Returns the earliest Date fitting [datePattern] on or after both [activeWindow].start and [otherStart] */
-    private fun earliestMutualFitWith(otherStart: LocalDate) =
-        datePattern.nextOccurrenceFrom(maxOf(otherStart, activeWindow.start))
 }

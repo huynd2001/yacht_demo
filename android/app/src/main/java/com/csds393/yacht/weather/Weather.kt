@@ -1,17 +1,14 @@
-@file:UseSerializers(ZonedDateTimeAsStringSerializer::class)
-
 package com.csds393.yacht.weather
 
 import kotlinx.serialization.*
-import kotlinx.serialization.descriptors.*
-import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.*
 import java.net.*
 import java.time.*
 import java.util.regex.Pattern
 
 /** Temp stand in for getting from online. */
-private const val weatherJSONString = "{\"@context\":[\"https://geojson.org/geojson-ld/geojson-context.jsonld\",{\"@version\":\"1.1\",\"wx\":\"https://api.weather.gov/ontology#\",\"geo\":\"http://www.opengis.net/ont/geosparql#\",\"unit\":\"http://codes.wmo.int/common/unit/\",\"@vocab\":\"https://api.weather.gov/ontology#\"}],\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-77.036996200000004,38.900789000000003],[-77.040754800000002,38.878836500000006],[-77.012551900000005,38.875908600000002],[-77.008787600000005,38.897860800000004],[-77.036996200000004,38.900789000000003]]]},\"properties\":{\"updated\":\"2021-10-24T14:31:32+00:00\",\"units\":\"us\",\"forecastGenerator\":\"BaselineForecastGenerator\",\"generatedAt\":\"2021-10-24T14:42:50+00:00\",\"updateTime\":\"2021-10-24T14:31:32+00:00\",\"validTimes\":\"2021-10-24T08:00:00+00:00/P7DT17H\",\"elevation\":{\"unitCode\":\"wmoUnit:m\",\"value\":6.0960000000000001},\"periods\":[{\"number\":1,\"name\":\"Today\",\"startTime\":\"2021-10-24T10:00:00-04:00\",\"endTime\":\"2021-10-24T18:00:00-04:00\",\"isDaytime\":true,\"temperature\":71,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"3 to 7 mph\",\"windDirection\":\"S\",\"icon\":\"https://api.weather.gov/icons/land/day/rain_showers,20/bkn?size=medium\",\"shortForecast\":\"Slight Chance Rain Showers then Partly Sunny\",\"detailedForecast\":\"A slight chance of rain showers before 11am. Partly sunny, with a high near 71. South wind 3 to 7 mph. Chance of precipitation is 20%.\"},{\"number\":2,\"name\":\"Tonight\",\"startTime\":\"2021-10-24T18:00:00-04:00\",\"endTime\":\"2021-10-25T06:00:00-04:00\",\"isDaytime\":false,\"temperature\":58,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"6 mph\",\"windDirection\":\"S\",\"icon\":\"https://api.weather.gov/icons/land/night/sct?size=medium\",\"shortForecast\":\"Partly Cloudy\",\"detailedForecast\":\"Partly cloudy, with a low around 58. South wind around 6 mph.\"},{\"number\":3,\"name\":\"Monday\",\"startTime\":\"2021-10-25T06:00:00-04:00\",\"endTime\":\"2021-10-25T18:00:00-04:00\",\"isDaytime\":true,\"temperature\":77,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"6 to 10 mph\",\"windDirection\":\"S\",\"icon\":\"https://api.weather.gov/icons/land/day/bkn/tsra_sct,60?size=medium\",\"shortForecast\":\"Partly Sunny then Showers And Thunderstorms Likely\",\"detailedForecast\":\"A chance of rain showers between 2pm and 5pm, then showers and thunderstorms likely. Partly sunny, with a high near 77. South wind 6 to 10 mph, with gusts as high as 21 mph. Chance of precipitation is 60%. New rainfall amounts between a quarter and half of an inch possible.\"},{\"number\":4,\"name\":\"Monday Night\",\"startTime\":\"2021-10-25T18:00:00-04:00\",\"endTime\":\"2021-10-26T06:00:00-04:00\",\"isDaytime\":false,\"temperature\":57,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"6 mph\",\"windDirection\":\"S\",\"icon\":\"https://api.weather.gov/icons/land/night/tsra,70?size=medium\",\"shortForecast\":\"Showers And Thunderstorms Likely\",\"detailedForecast\":\"Showers and thunderstorms likely. Mostly cloudy, with a low around 57. South wind around 6 mph. Chance of precipitation is 70%. New rainfall amounts between a half and three quarters of an inch possible.\"},{\"number\":5,\"name\":\"Tuesday\",\"startTime\":\"2021-10-26T06:00:00-04:00\",\"endTime\":\"2021-10-26T18:00:00-04:00\",\"isDaytime\":true,\"temperature\":65,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"6 to 14 mph\",\"windDirection\":\"NW\",\"icon\":\"https://api.weather.gov/icons/land/day/tsra_hi,70/tsra_hi,30?size=medium\",\"shortForecast\":\"Showers And Thunderstorms Likely\",\"detailedForecast\":\"Showers and thunderstorms likely. Partly sunny, with a high near 65. Northwest wind 6 to 14 mph, with gusts as high as 29 mph. Chance of precipitation is 70%.\"},{\"number\":6,\"name\":\"Tuesday Night\",\"startTime\":\"2021-10-26T18:00:00-04:00\",\"endTime\":\"2021-10-27T06:00:00-04:00\",\"isDaytime\":false,\"temperature\":51,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"10 to 14 mph\",\"windDirection\":\"NW\",\"icon\":\"https://api.weather.gov/icons/land/night/rain_showers,30/rain_showers,20?size=medium\",\"shortForecast\":\"Chance Rain Showers\",\"detailedForecast\":\"A chance of rain showers before 2am. Mostly cloudy, with a low around 51. Chance of precipitation is 30%.\"},{\"number\":7,\"name\":\"Wednesday\",\"startTime\":\"2021-10-27T06:00:00-04:00\",\"endTime\":\"2021-10-27T18:00:00-04:00\",\"isDaytime\":true,\"temperature\":65,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"12 mph\",\"windDirection\":\"NW\",\"icon\":\"https://api.weather.gov/icons/land/day/bkn?size=medium\",\"shortForecast\":\"Partly Sunny\",\"detailedForecast\":\"Partly sunny, with a high near 65.\"},{\"number\":8,\"name\":\"Wednesday Night\",\"startTime\":\"2021-10-27T18:00:00-04:00\",\"endTime\":\"2021-10-28T06:00:00-04:00\",\"isDaytime\":false,\"temperature\":51,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"2 to 8 mph\",\"windDirection\":\"N\",\"icon\":\"https://api.weather.gov/icons/land/night/sct?size=medium\",\"shortForecast\":\"Partly Cloudy\",\"detailedForecast\":\"Partly cloudy, with a low around 51.\"},{\"number\":9,\"name\":\"Thursday\",\"startTime\":\"2021-10-28T06:00:00-04:00\",\"endTime\":\"2021-10-28T18:00:00-04:00\",\"isDaytime\":true,\"temperature\":66,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"2 to 7 mph\",\"windDirection\":\"NE\",\"icon\":\"https://api.weather.gov/icons/land/day/bkn/rain_showers?size=medium\",\"shortForecast\":\"Partly Sunny then Slight Chance Rain Showers\",\"detailedForecast\":\"A slight chance of rain showers after 2pm. Partly sunny, with a high near 66.\"},{\"number\":10,\"name\":\"Thursday Night\",\"startTime\":\"2021-10-28T18:00:00-04:00\",\"endTime\":\"2021-10-29T06:00:00-04:00\",\"isDaytime\":false,\"temperature\":54,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"7 mph\",\"windDirection\":\"E\",\"icon\":\"https://api.weather.gov/icons/land/night/rain_showers,40/rain_showers,50?size=medium\",\"shortForecast\":\"Chance Rain Showers\",\"detailedForecast\":\"A chance of rain showers. Mostly cloudy, with a low around 54. Chance of precipitation is 50%.\"},{\"number\":11,\"name\":\"Friday\",\"startTime\":\"2021-10-29T06:00:00-04:00\",\"endTime\":\"2021-10-29T18:00:00-04:00\",\"isDaytime\":true,\"temperature\":66,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"6 to 9 mph\",\"windDirection\":\"SE\",\"icon\":\"https://api.weather.gov/icons/land/day/rain_showers,50/rain_showers,60?size=medium\",\"shortForecast\":\"Rain Showers Likely\",\"detailedForecast\":\"Rain showers likely. Mostly cloudy, with a high near 66. Chance of precipitation is 60%.\"},{\"number\":12,\"name\":\"Friday Night\",\"startTime\":\"2021-10-29T18:00:00-04:00\",\"endTime\":\"2021-10-30T06:00:00-04:00\",\"isDaytime\":false,\"temperature\":52,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"3 to 7 mph\",\"windDirection\":\"SE\",\"icon\":\"https://api.weather.gov/icons/land/night/rain_showers,60/rain_showers,40?size=medium\",\"shortForecast\":\"Rain Showers Likely\",\"detailedForecast\":\"Rain showers likely. Mostly cloudy, with a low around 52. Chance of precipitation is 60%.\"},{\"number\":13,\"name\":\"Saturday\",\"startTime\":\"2021-10-30T06:00:00-04:00\",\"endTime\":\"2021-10-30T18:00:00-04:00\",\"isDaytime\":true,\"temperature\":63,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"3 to 8 mph\",\"windDirection\":\"SW\",\"icon\":\"https://api.weather.gov/icons/land/day/rain_showers,30/rain_showers,40?size=medium\",\"shortForecast\":\"Chance Rain Showers\",\"detailedForecast\":\"A chance of rain showers. Partly sunny, with a high near 63. Chance of precipitation is 40%.\"},{\"number\":14,\"name\":\"Saturday Night\",\"startTime\":\"2021-10-30T18:00:00-04:00\",\"endTime\":\"2021-10-31T06:00:00-04:00\",\"isDaytime\":false,\"temperature\":49,\"temperatureUnit\":\"F\",\"temperatureTrend\":null,\"windSpeed\":\"7 mph\",\"windDirection\":\"NW\",\"icon\":\"https://api.weather.gov/icons/land/night/rain_showers,40/rain_showers?size=medium\",\"shortForecast\":\"Chance Rain Showers\",\"detailedForecast\":\"A chance of rain showers. Mostly cloudy, with a low around 49. Chance of precipitation is 40%.\"}]}}\n"
+private const val weatherJSONString =
+    "{\n\"@context\": [\n\"https://geojson.org/geojson-ld/geojson-context.jsonld\",\n  {\n\"@version\": \"1.1\",\n\"wx\": \"https://api.weather.gov/ontology#\",\n\"geo\": \"http://www.opengis.net/ont/geosparql#\",\n\"unit\": \"http://codes.wmo.int/common/unit/\",\n\"@vocab\": \"https://api.weather.gov/ontology#\"\n  }\n ],\n\"type\": \"Feature\",\n\"geometry\": {\n\"type\": \"Polygon\",\n\"coordinates\": [\n      [\n          [\n              -77.036996200000004,\n              38.900789000000003\n          ],\n          [\n              -77.040754800000002,\n              38.878836500000006\n          ],\n          [\n              -77.012551900000005,\n              38.875908600000002\n          ],\n          [\n              -77.008787600000005,\n              38.897860800000004\n          ],\n          [\n              -77.036996200000004,\n              38.900789000000003\n          ]\n      ]\n  ]\n },\n\"properties\": {\n\"updated\": \"2021-11-17T23:30:36+00:00\",\n\"units\": \"us\",\n\"forecastGenerator\": \"BaselineForecastGenerator\",\n\"generatedAt\": \"2021-11-17T23:52:57+00:00\",\n\"updateTime\": \"2021-11-17T23:30:36+00:00\",\n\"validTimes\": \"2021-11-17T17:00:00+00:00/P7DT8H\",\n\"elevation\": {\n\"unitCode\": \"wmoUnit:m\",\n\"value\": 6.0960000000000001\n  },\n\"periods\": [\n      {\n \"number\": 1,\n \"name\": \"Tonight\",\n \"startTime\": \"2021-11-17T18:00:00-05:00\",\n \"endTime\": \"2021-11-18T06:00:00-05:00\",\n \"isDaytime\": false,\n \"temperature\": 51,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"3 to 7 mph\",\n \"windDirection\": \"S\",\n \"icon\": \"https://api.weather.gov/icons/land/night/few?size=medium\",\n \"shortForecast\": \"Mostly Clear\",\n \"detailedForecast\": \"Mostly clear, with a low around 51. South wind 3 to 7 mph.\"\n      },\n      {\n \"number\": 2,\n \"name\": \"Thursday\",\n \"startTime\": \"2021-11-18T06:00:00-05:00\",\n \"endTime\": \"2021-11-18T18:00:00-05:00\",\n \"isDaytime\": true,\n \"temperature\": 74,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": \"falling\",\n \"windSpeed\": \"7 to 15 mph\",\n \"windDirection\": \"SW\",\n \"icon\": \"https://api.weather.gov/icons/land/day/few/rain_showers,30?size=medium\",\n \"shortForecast\": \"Sunny then Chance Rain Showers\",\n \"detailedForecast\": \"A chance of rain showers after 4pm. Sunny. High near 74, with temperatures falling to around 68 in the afternoon. Southwest wind 7 to 15 mph, with gusts as high as 30 mph. Chance of precipitation is 30%. New rainfall amounts less than a tenth of an inch possible.\"\n      },\n      {\n \"number\": 3,\n \"name\": \"Thursday Night\",\n \"startTime\": \"2021-11-18T18:00:00-05:00\",\n \"endTime\": \"2021-11-19T06:00:00-05:00\",\n \"isDaytime\": false,\n \"temperature\": 41,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"12 mph\",\n \"windDirection\": \"W\",\n \"icon\": \"https://api.weather.gov/icons/land/night/rain_showers,70/rain_showers,60?size=medium\",\n \"shortForecast\": \"Rain Showers Likely\",\n \"detailedForecast\": \"Rain showers likely. Mostly cloudy, with a low around 41. West wind around 12 mph, with gusts as high as 20 mph. Chance of precipitation is 70%. New rainfall amounts between a tenth and quarter of an inch possible.\"\n      },\n      {\n \"number\": 4,\n \"name\": \"Friday\",\n \"startTime\": \"2021-11-19T06:00:00-05:00\",\n \"endTime\": \"2021-11-19T18:00:00-05:00\",\n \"isDaytime\": true,\n \"temperature\": 50,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"9 to 16 mph\",\n \"windDirection\": \"NW\",\n \"icon\": \"https://api.weather.gov/icons/land/day/rain_showers,20/few?size=medium\",\n \"shortForecast\": \"Slight Chance Rain Showers then Sunny\",\n \"detailedForecast\": \"A slight chance of rain showers before 7am. Sunny, with a high near 50. Northwest wind 9 to 16 mph, with gusts as high as 25 mph. Chance of precipitation is 20%.\"\n      },\n      {\n \"number\": 5,\n \"name\": \"Friday Night\",\n \"startTime\": \"2021-11-19T18:00:00-05:00\",\n \"endTime\": \"2021-11-20T06:00:00-05:00\",\n \"isDaytime\": false,\n \"temperature\": 29,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"2 to 8 mph\",\n \"windDirection\": \"NW\",\n \"icon\": \"https://api.weather.gov/icons/land/night/few?size=medium\",\n \"shortForecast\": \"Mostly Clear\",\n \"detailedForecast\": \"Mostly clear, with a low around 29. Northwest wind 2 to 8 mph.\"\n      },\n      {\n \"number\": 6,\n \"name\": \"Saturday\",\n \"startTime\": \"2021-11-20T06:00:00-05:00\",\n \"endTime\": \"2021-11-20T18:00:00-05:00\",\n \"isDaytime\": true,\n \"temperature\": 50,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"1 to 5 mph\",\n \"windDirection\": \"E\",\n \"icon\": \"https://api.weather.gov/icons/land/day/sct?size=medium\",\n \"shortForecast\": \"Mostly Sunny\",\n \"detailedForecast\": \"Mostly sunny, with a high near 50.\"\n      },\n      {\n \"number\": 7,\n \"name\": \"Saturday Night\",\n \"startTime\": \"2021-11-20T18:00:00-05:00\",\n \"endTime\": \"2021-11-21T06:00:00-05:00\",\n \"isDaytime\": false,\n \"temperature\": 37,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"3 mph\",\n \"windDirection\": \"S\",\n \"icon\": \"https://api.weather.gov/icons/land/night/bkn?size=medium\",\n \"shortForecast\": \"Mostly Cloudy\",\n \"detailedForecast\": \"Mostly cloudy, with a low around 37.\"\n      },\n      {\n \"number\": 8,\n \"name\": \"Sunday\",\n \"startTime\": \"2021-11-21T06:00:00-05:00\",\n \"endTime\": \"2021-11-21T18:00:00-05:00\",\n \"isDaytime\": true,\n \"temperature\": 56,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"2 to 6 mph\",\n \"windDirection\": \"S\",\n \"icon\": \"https://api.weather.gov/icons/land/day/bkn?size=medium\",\n \"shortForecast\": \"Partly Sunny\",\n \"detailedForecast\": \"Partly sunny, with a high near 56.\"\n      },\n      {\n \"number\": 9,\n \"name\": \"Sunday Night\",\n \"startTime\": \"2021-11-21T18:00:00-05:00\",\n \"endTime\": \"2021-11-22T06:00:00-05:00\",\n \"isDaytime\": false,\n \"temperature\": 44,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"2 to 6 mph\",\n \"windDirection\": \"S\",\n \"icon\": \"https://api.weather.gov/icons/land/night/rain_showers,40?size=medium\",\n \"shortForecast\": \"Chance Rain Showers\",\n \"detailedForecast\": \"A chance of rain showers after 7pm. Mostly cloudy, with a low around 44. Chance of precipitation is 40%.\"\n      },\n      {\n \"number\": 10,\n \"name\": \"Monday\",\n \"startTime\": \"2021-11-22T06:00:00-05:00\",\n \"endTime\": \"2021-11-22T18:00:00-05:00\",\n \"isDaytime\": true,\n \"temperature\": 56,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"5 to 12 mph\",\n \"windDirection\": \"W\",\n \"icon\": \"https://api.weather.gov/icons/land/day/rain_showers,40?size=medium\",\n \"shortForecast\": \"Chance Rain Showers\",\n \"detailedForecast\": \"A chance of rain showers. Partly sunny, with a high near 56. Chance of precipitation is 40%.\"\n      },\n      {\n \"number\": 11,\n \"name\": \"Monday Night\",\n \"startTime\": \"2021-11-22T18:00:00-05:00\",\n \"endTime\": \"2021-11-23T06:00:00-05:00\",\n \"isDaytime\": false,\n \"temperature\": 32,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"12 mph\",\n \"windDirection\": \"NW\",\n \"icon\": \"https://api.weather.gov/icons/land/night/rain_showers,40/rain_showers?size=medium\",\n \"shortForecast\": \"Chance Rain Showers\",\n \"detailedForecast\": \"A chance of rain showers before 1am. Partly cloudy, with a low around 32. Chance of precipitation is 40%.\"\n      },\n      {\n \"number\": 12,\n \"name\": \"Tuesday\",\n \"startTime\": \"2021-11-23T06:00:00-05:00\",\n \"endTime\": \"2021-11-23T18:00:00-05:00\",\n \"isDaytime\": true,\n \"temperature\": 46,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"10 to 18 mph\",\n \"windDirection\": \"NW\",\n \"icon\": \"https://api.weather.gov/icons/land/day/sct?size=medium\",\n \"shortForecast\": \"Mostly Sunny\",\n \"detailedForecast\": \"Mostly sunny, with a high near 46.\"\n      },\n      {\n \"number\": 13,\n \"name\": \"Tuesday Night\",\n \"startTime\": \"2021-11-23T18:00:00-05:00\",\n \"endTime\": \"2021-11-24T06:00:00-05:00\",\n \"isDaytime\": false,\n \"temperature\": 33,\n \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"10 to 14 mph\",\n \"windDirection\": \"NW\",\n \"icon\": \"https://api.weather.gov/icons/land/night/few?size=medium\",\n \"shortForecast\": \"Mostly Clear\",\n \"detailedForecast\": \"Mostly clear, with a low around 33.\"\n      },\n      {\n \"number\": 14,\n \"name\": \"Wednesday\",\n \"startTime\": \"2021-11-24T06:00:00-05:00\",\n \"endTime\": \"2021-11-24T18:00:00-05:00\",\n\"isDaytime\": true,\n \"temperature\": 50,\n  \"temperatureUnit\": \"F\",\n \"temperatureTrend\": null,\n \"windSpeed\": \"8 to 12 mph\",\n\"windDirection\": \"W\",\n\"icon\": \"https://api.weather.gov/icons/land/day/few?size=medium\",\n \"shortForecast\": \"Sunny\",\n \"detailedForecast\": \"Sunny, with a high near 50.\"\n  }\n ]\n}\n}"
 
 /** Will eventually become fleshed-out Weather Component of back-end */
 object Weather {
@@ -22,9 +19,8 @@ object Weather {
     val forecasts = getNewestWeather()
 
     /** Prototype for Weather Component procedure of polling NWS and decoding JSON */
-    @JvmStatic
     private fun getNewestWeather(): List<HalfDayWeather>? {
-        val jsonString = getMockWeather()
+        val jsonString = getWeatherJsonStringFromOnline(hardcoded_url)
         val element = json.parseToJsonElement(jsonString)
 
         val weatherElementList = element.jsonObject["properties"]?.jsonObject?.get("periods")?.jsonArray
@@ -34,70 +30,60 @@ object Weather {
 
     private fun getMockWeather() = weatherJSONString
 
-    // TODO: 10/22/2021  parameterize URL and/or location
-    // TODO: 10/24/2021  doesn't work in android emulator. port to some library?
-    private fun getWeatherJsonStringFromOnline(): String {
-        val url = URL("https://api.weather.gov/gridpoints/LWX/96,70/forecast")
-        val string = (url.openConnection() as? HttpURLConnection)?.run {
+    val hardcoded_url = URL("https://api.weather.gov/gridpoints/LWX/96,70/forecast")
+
+
+    fun getWeatherJsonStringFromOnline(forecastUrl: URL): String {
+        val string = (forecastUrl.openConnection() as? HttpURLConnection)?.run {
             readTimeout = 10000
             connectTimeout = 15000
+            setRequestProperty("User-Agent", "potato")
             requestMethod = "GET"
             doInput = true
-            // Starts the query
-            connect()
-            inputStream
-                .bufferedReader()
-                .readText()
+            inputStream.use {
+                it.bufferedReader().readText()
+            }
         }
         return string!!
     }
 
 }
-//"periods":[
-// example of JSON element for single weather (half day)
-// {"number":1,"name":"Today","startTime":"2021-10-24T10:00:00-04:00",
-// "endTime":"2021-10-24T18:00:00-04:00","isDaytime":true,
-// "temperature":71,"temperatureUnit":"F","temperatureTrend":null,
-// "windSpeed":"3 to 7 mph","windDirection":"S",
-// "icon":"https://api.weather.gov/icons/land/day/rain_showers,20/bkn?size=medium",
-// "shortForecast":"Slight Chance Rain Showers then Partly Sunny",
-// "detailedForecast":"A slight chance of rain showers before 11am. Partly sunny, with a high near 71. South wind 3 to 7 mph. Chance of precipitation is 20%."},
 
 /* Object that directly maps to above period object from GeoJSON */
 /** Represents the forecast for half a day */
 @Serializable
 data class HalfDayWeather(
     @SerialName("startTime")
-    val zonedDate: ZonedDateTime,
+    private val zonedDateTimeString: String,
     val isDaytime: Boolean,
     val temperature: Int,
     private val windSpeed: String,
     val shortForecast: String,
     val detailedForecast: String,
 ) {
-    val windSpeedRange: IntRange
-        get() {
-            val numberPattern = Pattern.compile("\\d+")
-            val matcher = numberPattern.matcher(windSpeed)
-            matcher.find()
-            val start = Integer.parseInt(matcher.group())
-            val end = if (matcher.find()) Integer.parseInt(matcher.group()) else start
-            return IntRange(start, end)
-        }
-    val localDate: LocalDate
-        get() = zonedDate.toLocalDate()
 
-    val sky: Sky
-        get() {
-            return when {
-                shortForecast.contains("Sunny") -> Sky.SUNNY
-                shortForecast.contains("Cloudy") -> Sky.CLOUDY
-                shortForecast.contains("Rain") -> Sky.RAINY
-                else -> Sky.CLEAR
-            }
+    val windSpeedRange: IntRange by lazy {
+        val matcher = numberPattern.matcher(windSpeed)
+        matcher.find()
+        val start = Integer.parseInt(matcher.group())
+        val end = if (matcher.find()) Integer.parseInt(matcher.group()) else start
+        IntRange(start, end)
+    }
+
+    val zonedDateTime: ZonedDateTime by lazy { ZonedDateTime.parse(zonedDateTimeString) }
+
+    // TODO: 10/25/2021  more sophisticated sky field and parsing
+    val sky: Sky by lazy {
+        when {
+            shortForecast.contains("Sunny") -> Sky.SUNNY
+            shortForecast.contains("Cloudy") -> Sky.CLOUDY
+            shortForecast.contains("Rain") -> Sky.RAINY
+            else -> Sky.CLEAR
         }
-    fun toWeatherData(): WeatherData {
-        return WeatherData(localDate.dayOfWeek, temperature, sky, windSpeedRange.first)
+    }
+
+    companion object {
+        private val numberPattern: Pattern = Pattern.compile("\\d+")
     }
 }
 
@@ -105,17 +91,4 @@ data class HalfDayWeather(
 // TODO: 10/24/2021  refactor, perhaps compose Forecast from Likelihood+Condition + optional then Forecast
 enum class Sky {
     SUNNY, CLOUDY, RAINY, CLEAR
-
-}
-
-
-object ZonedDateTimeAsStringSerializer: KSerializer<ZonedDateTime> {
-
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("ZonedDateTimeAsStringSerializer", PrimitiveKind.STRING)
-
-    override fun deserialize(decoder: Decoder): ZonedDateTime =
-        ZonedDateTime.parse(decoder.decodeString())
-
-    override fun serialize(encoder: Encoder, value: ZonedDateTime) =
-        encoder.encodeString(value.toString())
 }

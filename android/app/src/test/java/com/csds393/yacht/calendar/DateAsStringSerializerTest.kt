@@ -3,7 +3,7 @@ package com.csds393.yacht.calendar
 import com.csds393.yacht.AbstractSerializationTest
 import java.time.LocalDate
 
-fun LocalDate.toStringDatePair() = Pair(this.toString(), this)
+private fun LocalDate.toStringDatePair() = Pair(this.toString(), this)
 
 class DateAsStringSerializerTest : AbstractSerializationTest<LocalDate>(
     mapOf(

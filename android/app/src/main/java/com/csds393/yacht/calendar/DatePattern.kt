@@ -13,7 +13,6 @@ import java.time.temporal.TemporalAdjusters.*
  * A pattern for Dates.
  * Ex: Every Monday, every 3 days, 2nd day of every month, every June 6th
  */
-// TODO: 10/20/2021  perhaps function returns list of valid Dates given a window?
 interface DatePattern {
 
     /** Returns the soonest applicable date strictly after [date] */
@@ -21,6 +20,27 @@ interface DatePattern {
 
     /** Returns the soonest applicable date on or after [date] */
     fun nextOccurrenceFrom(date: LocalDate): LocalDate
+
+    /**
+     * Returns the list of dates contained in both [queryWindow]
+     * and [activeWindow] that fit this pattern
+     */
+    fun getOccurrencesInWindows(
+        queryWindow: ClosedRange<LocalDate>,
+        activeWindow: ClosedRange<LocalDate>
+    ): List<LocalDate> {
+        val dates: MutableList<LocalDate> = mutableListOf()
+        // first possible occurrence after each window's start dates
+        var nextOccurrence = maxOf(queryWindow.start, activeWindow.start)
+
+        val latestDate = minOf(queryWindow.endInclusive, activeWindow.endInclusive)
+        // keep adding while valid
+        while (latestDate.isAfter(nextOccurrence)) {
+            dates.add(nextOccurrence)
+            nextOccurrence = nextOccurrenceAfter(nextOccurrence)
+        }
+        return dates
+    }
 
     companion object { // factory methods
         /** Returns a DatePattern for 'once a day' */
@@ -83,7 +103,7 @@ interface DatePattern {
         override fun nextOccurrenceFrom(date: LocalDate): LocalDate = date.with(dayOfWeekTemporalAdjuster)
     }
 
-    private class NthDayOfEveryMonth(val n: Int): DatePattern {
+    private class NthDayOfEveryMonth(@IntRange(from = 1, to = 31) val n: Int, ): DatePattern {
         override fun nextOccurrenceFrom(date: LocalDate): LocalDate = when {
             // if #days in month < n, last day of current month
             (date.lengthOfMonth() < n) -> date.with(lastDayOfMonth())

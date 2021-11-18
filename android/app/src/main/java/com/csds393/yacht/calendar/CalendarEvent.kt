@@ -14,10 +14,10 @@ import java.time.*
  * Deeply immutable.
  */
 @Serializable
-data class CalendarEvent @JvmOverloads constructor(
+data class CalendarEvent (
         val startDate: LocalDate,
         val startTime: LocalTime? = null,
-        val endDate: LocalDate? = null,
+        val endDate: LocalDate = startDate,
         val endTime: LocalTime? = null,
         val details: Details
         ) : Comparable<CalendarEvent> {
@@ -28,7 +28,7 @@ data class CalendarEvent @JvmOverloads constructor(
      * Ranks by:
      * Earlier [startDate],
      * Absent [startTime] > earlier [startTime],
-     * Absent [endDate] > earlier [endDate],
+     * Earlier [endDate],
      * Earlier [endTime] > absent [endTime],
      * Compare [details]
      */
@@ -43,8 +43,8 @@ data class CalendarEvent @JvmOverloads constructor(
         comp = (startTime?: LocalTime.MIN).compareTo(other.startTime?: LocalTime.MIN)
         if (comp != 0) return comp
 
-        // Absent endDate, earlier endDate
-        comp = (endDate?: LocalDate.MIN).compareTo(other.endDate?: LocalDate.MIN)
+        // earlier endDate
+        comp = (endDate).compareTo(other.endDate)
         if (comp != 0) return comp
 
         // Earlier endTime, absent endTime
@@ -54,6 +54,7 @@ data class CalendarEvent @JvmOverloads constructor(
         return details.compareTo(other.details)
     }
 
+    // TODO: 10/26/2021  probably migrate Icon to resource reference (URI?)
     /**
      * Encapsulates the non-temporal attributes of a CalendarEvent.
      * These include the label and description, among several others.
@@ -82,7 +83,7 @@ data class CalendarEvent @JvmOverloads constructor(
             if (comp != 0) return comp
 
             return description.compareTo(other.description)
-            // TODO: 10/17/2021  compare media fields
+            // TODO: 10/17/2021  possibly compare media fields
         }
     }
 }
