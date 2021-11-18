@@ -9,7 +9,7 @@ class EventRetriever {
   static void init() {}
 
   static List<EventItem> retrieveEvents(bool test(EventItem e)) {
-    return new List.from(_events.where(test));
+    return List.from(_events.where(test));
   }
 
   static void addEvent(EventItem event) {

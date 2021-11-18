@@ -16,7 +16,7 @@ class EventDisplay extends StatelessWidget {
     return new Stack(
       children: <Widget>[
         new Padding(
-          padding: const EdgeInsets.only(left: 50.0),
+          padding: const EdgeInsets.only(right: 50.0),
           child: new Card(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -53,12 +53,19 @@ class EventInDaysDisplay extends StatelessWidget {
     return Column(
       children: [
         Text(DateFormat('EEE, MMM d').format(begin)),
-        ListView.builder(
-          itemBuilder: (_, index) {
-            return EventDisplay(event: events[index]);
-          },
-          itemCount: events.length,
-        )
+        Divider(color: Colors.black),
+        ConstrainedBox(
+            constraints: new BoxConstraints(
+              minHeight: 50,
+            ),
+            child: ListView.builder(
+              itemBuilder: (_, index) {
+                return EventDisplay(event: events[index]);
+              },
+              itemCount: events.length,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+            ))
       ],
     );
   }

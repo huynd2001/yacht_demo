@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yacht_demo/day-display.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
 
 class EventItem {
@@ -67,37 +68,45 @@ class CalendarDisplay extends State<DateWidget> {
       Container(
         height: 200,
         child: ListView.builder(
-            itemBuilder: (_, index) {
-              DateTime startTime =
-                  EventRetriever.today().add(Duration(days: index));
-              DateTime endTime = startTime.add(Duration(days: 1));
-
-              return Card(
-                  child: Container(
-                width: 80,
-                height: 100,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                        ListTile(
-                            title: Text(startTime.day.toString() +
-                                '-' +
-                                startTime.month.toString()),
-                            subtitle: Text(
-                              DateFormat('EEE').format(startTime),
-                            ))
-                      ] +
-                      EventRetriever.retrieveEventFromStartEnd(
-                              startTime, endTime)
-                          .map((e) => Text(e.task))
-                          .take(4)
-                          .toList(),
+          itemBuilder: (_, index) {
+            DateTime startTime =
+                EventRetriever.today().add(Duration(days: index));
+            DateTime endTime = startTime.add(Duration(days: 1));
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => DayDisplay()),
+                );
+              },
+              child: Card(
+                child: Container(
+                  width: 80,
+                  height: 100,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                          ListTile(
+                              title: Text(DateFormat('M-d').format(startTime)),
+                              subtitle: Text(
+                                DateFormat('EEE').format(startTime),
+                              ))
+                        ] +
+                        EventRetriever.retrieveEventFromStartEnd(
+                                startTime, endTime)
+                            .map((e) => Text(e.task))
+                            .take(4)
+                            .toList(),
+                  ),
                 ),
-              ));
-            },
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(20.0),
-            scrollDirection: Axis.horizontal),
+              ),
+            );
+          },
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(20.0),
+          scrollDirection: Axis.horizontal,
+          addAutomaticKeepAlives: false,
+        ),
       ),
       ElevatedButton(
           onPressed: () {
