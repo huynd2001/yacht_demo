@@ -1,12 +1,18 @@
+import 'package:flutter/services.dart';
+
 import '../calendar.dart';
 
 class EventRetriever {
+  static const eventRetriever = MethodChannel('calendar/events');
+
   static final List<EventItem> _events = List.empty(growable: true);
 
   static DateTime today() => new DateTime(
       DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
 
-  static void init() {}
+  static void init() async {
+    List<String> normalEvents = await eventRetriever.invokeMethod('getEvents');
+  }
 
   static List<EventItem> retrieveEvents(bool test(EventItem e)) {
     return List.from(_events.where(test));

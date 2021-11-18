@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:infinite_listview/infinite_listview.dart';
+import 'package:intl/intl.dart';
+import 'package:yacht_demo/services/event-retriever.dart';
+import 'package:yacht_demo/services/weather-retriever.dart';
 
 import 'calendar.dart';
 
 class Weather extends StatelessWidget {
-  const Weather({ Key? key }) : super(key: key);
+  const Weather({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) =>
-      Text("Weather");
+  Widget build(BuildContext context) => Text("Weather");
 }
 
 class WeatherWidget extends StatefulWidget {
@@ -20,97 +23,100 @@ class WeatherWidget extends StatefulWidget {
 }
 
 class WeatherItem extends DateItem {
-  WeatherItem(DateTime startTime, DateTime endTime, this.temp, this.weather, this.windSpeed) : super(startTime, endTime);
+  WeatherItem._(DateTime startTime, DateTime endTime, this.temp, this.weather,
+      this.windSpeed)
+      : super(startTime, endTime);
 
   String weather;
   int windSpeed;
   int temp;
-}
 
-class WeatherDisplay extends State<WeatherWidget> {
-
-  static const platform = MethodChannel('yacht/weather');
-
-  List<WeatherItem> _weatherList = newList();
-
-  Future<String> _getWeather() async {
-    try {
-      final String result = await platform.invokeMethod('getWeather');
-      return result;
-    } on PlatformException catch (e) {
-      return 'Error';
-    }
+  factory WeatherItem.fromJson(Map<String, String> json) {
+    return WeatherItem._(
+        DateTime.parse(json['startTime'].toString()),
+        DateTime.parse(json['endTime'].toString()),
+        json['temp'] as int,
+        json['weather'].toString(),
+        json['windSpeed'] as int);
   }
 
-  static List<WeatherItem> newList() {
+  Map<String, String> toJson() => {
+        'startTime': startTime.toIso8601String(),
+        'endTime': endTime.toIso8601String(),
+        'temp': temp.toString(),
+        'weather': weather.toString(),
+        'windSpeed': windSpeed.toString()
+      };
+}
 
-    // DateTime today = new DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
+class WeatherItemDisplay extends StatefulWidget {
+  WeatherItemDisplay({Key? key, required this.startTime, required this.endTime})
+      : super(key: key);
 
-    // return List.generate(7, (index) => today.add(new Duration(hours: Duration.hoursPerDay * index)))
-    //     .map((d) => WeatherItem(d, d.add(new Duration(hours: Duration.hoursPerDay)) , 'SUNNY')).toList();
+  final DateTime startTime;
+  final DateTime endTime;
 
-    return MockCalendar().mockList();
+  @override
+  _WeatherItemDisplayState createState() => _WeatherItemDisplayState();
+}
 
+class _WeatherItemDisplayState extends State<WeatherItemDisplay> {
+  String _temp = "-";
+  String _windSpeed = "-";
+  String _weather = "notloaded";
+
+  @override
+  void initState() {
+    super.initState();
+    WeatherRetriever.retrieveDayWeather(widget.startTime, widget.endTime)
+        .then((value) => {
+              setState(() {
+                _temp = value.temp as String;
+                _windSpeed = value.windSpeed as String;
+                _weather = value.weather;
+              })
+            });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    List<Widget> widgets = _weatherList.map((d) => Card(
+    return Card(
         child: Container(
-          width: 80,
-          height: 100,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                title: Column(
-                  children: <Widget>[
-                    Text(d.startTime.day.toString() + '-' + d.startTime.month.toString())
-                  ]
-                ),
-                subtitle: Column(
-                    children: <Widget>[
-                      Image(image: AssetImage('assets/weather/${d.weather}.png')),
-                      Text('${d.temp} F'),
-                      Text('${d.windSpeed} mph')
-                  ]
-                )
-              )
-            ],
-          ),
-        )
-    )).cast<Widget>().toList();
-
-    return Column(
+      width: 80,
+      height: 100,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Container(
-            height: 200,
-            child: ListView(
-                shrinkWrap: true,
-                padding: const EdgeInsets.all(20.0),
-                scrollDirection: Axis.horizontal,
-                children: widgets
-            ),
-          )
-        ]
-    );
+          ListTile(
+              title: Column(children: <Widget>[
+                Text(DateFormat('M-d').format(widget.startTime))
+              ]),
+              subtitle: Column(children: <Widget>[
+                Image(image: AssetImage('assets/weather/$_weather.png')),
+                Text('$_temp F'),
+                Text('$_windSpeed mph')
+              ]))
+        ],
+      ),
+    ));
   }
 }
 
-class MockCalendar {
-  List<WeatherItem> mockList() {
-
-    DateTime today = new DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
-
-    return <WeatherItem>[
-      WeatherItem(today.add(new Duration(days: 0)), today.add(new Duration(days: 1)), 78, 'clearday', 8),
-      WeatherItem(today.add(new Duration(days: 1)), today.add(new Duration(days: 2)), 70, 'clearday', 6),
-      WeatherItem(today.add(new Duration(days: 2)), today.add(new Duration(days: 3)), 67, 'clearday', 4),
-      WeatherItem(today.add(new Duration(days: 3)), today.add(new Duration(days: 4)), 71, 'clearday', 8),
-      WeatherItem(today.add(new Duration(days: 4)), today.add(new Duration(days: 5)), 68, 'rainyday', 6),
-      WeatherItem(today.add(new Duration(days: 5)), today.add(new Duration(days: 6)), 68, 'rainyday', 8),
-      WeatherItem(today.add(new Duration(days: 6)), today.add(new Duration(days: 7)), 64, 'foggyday', 7),
-    ];
+class WeatherDisplay extends State<WeatherWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: <Widget>[
+      Container(
+        height: 200,
+        child: InfiniteListView.builder(
+            itemBuilder: (_, index) {
+              DateTime startTime =
+                  EventRetriever.today().add(Duration(days: index));
+              DateTime endTime = startTime.add(Duration(days: 1));
+              return WeatherItemDisplay(startTime: startTime, endTime: endTime);
+            },
+            scrollDirection: Axis.horizontal),
+      )
+    ]);
   }
 }

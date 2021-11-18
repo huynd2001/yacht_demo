@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_listview/infinite_listview.dart';
@@ -18,19 +20,26 @@ class EventItem {
     eventIdTracking++;
     return new EventItem._(startTime, endTime, task, eventIdTracking);
   }
+
+  EventItem.fromJson(Map<String, String> json)
+      : startTime = DateTime.parse(json['startTime'].toString()),
+        endTime = DateTime.parse(json['endTime'].toString()),
+        task = json['task'].toString(),
+        id = int.parse(json['id'] ?? "-1");
+
+  Map<String, String> toJson() => {
+        'startTime': startTime.toIso8601String(),
+        'endTime': endTime.toIso8601String(),
+        'task': task,
+        'id': id.toString()
+      };
 }
 
 class DateItem {
   final DateTime startTime;
   final DateTime endTime;
 
-  List<EventItem> events = List.empty();
   DateItem(this.startTime, this.endTime);
-
-  DateItem add(EventItem item) {
-    events.add(item);
-    return this;
-  }
 }
 
 class DateWidget extends StatefulWidget {
@@ -46,16 +55,6 @@ class CalendarDisplay extends State<DateWidget> {
   DateTime formEndTime = DateTime.now();
 
   final _formKey = GlobalKey<FormState>();
-
-  static List<DateItem> newList() {
-    return List.generate(
-            7,
-            (index) => EventRetriever.today()
-                .add(new Duration(hours: Duration.hoursPerDay * index)))
-        .map((d) =>
-            DateItem(d, d.add(new Duration(hours: Duration.hoursPerDay))))
-        .toList();
-  }
 
   void addEvent(EventItem e) {
     setState(() {
