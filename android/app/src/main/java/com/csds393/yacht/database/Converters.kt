@@ -1,8 +1,7 @@
 package com.csds393.yacht.database
 
 import androidx.room.TypeConverter
-import java.time.LocalDate
-import java.time.LocalTime
+import java.time.*
 
 class Converters {
 
@@ -34,6 +33,31 @@ class Converters {
             }
         }
 
+        @TypeConverter
+        @JvmStatic
+        fun intRangeToLong(value: IntRange?): Long? = value?.let {
+            value.last.toLong().shl(32) + value.first
+        }
+        @TypeConverter
+        @JvmStatic
+        fun longToIntRange(value: Long?): IntRange? {
+            return value?.let {
+                value.and(0xFFFF_FFFF).toInt()..(value.ushr(32).and(0xFFFF_FFFF).toInt())
+            }
+        }
+
+        @TypeConverter
+        @JvmStatic
+        fun zonedDateTimeToLong(value: ZonedDateTime?): Long? = value?.let {
+            value.toEpochSecond()
+        }
+        @TypeConverter
+        @JvmStatic
+        fun longToZonedDateTime(value: Long?): ZonedDateTime? {
+            return value?.let {
+                LocalDateTime.ofEpochSecond(value, 0, ZoneOffset.ofHours(0)).atZone(ZoneId.systemDefault())
+            }
+        }
 
     }
 }

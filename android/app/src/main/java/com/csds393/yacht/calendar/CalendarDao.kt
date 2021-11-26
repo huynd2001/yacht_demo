@@ -27,15 +27,15 @@ interface CalendarDao {
     fun getLabelsInDateRange(earliest: LocalDate, latest: LocalDate): List<String>
 
     @Query("SELECT * FROM recurring_events")
-    fun _getRecursiveEvents(): List<RecurringCalendarEvent>
+    fun _getRecurringEvents(): List<RecurringCalendarEvent>
 
     @Query("SELECT date FROM recurrence_exceptions WHERE event_id = :id")
     fun _getExceptionsForEvent(id: Int): List<LocalDate>
 
     @Transaction // in newer versions of Room, this can be replaced with multimap return type
-    fun getRecursiveEventsWithExceptions() =
+    fun getRecurringEventsWithExceptions() =
         // RecCalEvents retrieved from database guaranteed to have non-null rec_id
-        _getRecursiveEvents().associateWith { _getExceptionsForEvent(it.rec_id!!) }
+        _getRecurringEvents().associateWith { _getExceptionsForEvent(it.rec_id!!) }
 
 
     /* Update */

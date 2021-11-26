@@ -33,16 +33,17 @@ class WeatherItem extends DateItem {
 
   factory WeatherItem.fromJson(Map<String, String> json) {
     return WeatherItem._(
-        DateTime.parse(json['startTime'].toString()),
-        DateTime.parse(json['endTime'].toString()),
-        json['temp'] as int,
+        DateFormat('yyyy-MM-ddTHH:mm:ss.mmm')
+            .parse(json['startTime'].toString()),
+        DateFormat('yyyy-MM-ddTHH:mm:ss.mmm').parse(json['endTime'].toString()),
+        int.tryParse(json['temp'].toString()) ?? 0,
         json['weather'].toString(),
-        json['windSpeed'] as int);
+        int.tryParse(json['windSpeed'].toString()) ?? 0);
   }
 
   Map<String, String> toJson() => {
-        'startTime': startTime.toIso8601String(),
-        'endTime': endTime.toIso8601String(),
+        'startTime': DateFormat('yyyy-MM-ddTHH:mm:ss.mmm').format(startTime),
+        'endTime': DateFormat('yyyy-MM-ddTHH:mm:ss.mmm').format(startTime),
         'temp': temp.toString(),
         'weather': weather.toString(),
         'windSpeed': windSpeed.toString()
@@ -71,8 +72,8 @@ class _WeatherItemDisplayState extends State<WeatherItemDisplay> {
     WeatherRetriever.retrieveDayWeather(widget.startTime, widget.endTime)
         .then((value) => {
               setState(() {
-                _temp = value.temp as String;
-                _windSpeed = value.windSpeed as String;
+                _temp = value.temp.toString();
+                _windSpeed = value.windSpeed.toString();
                 _weather = value.weather;
               })
             });

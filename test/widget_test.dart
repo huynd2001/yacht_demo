@@ -7,12 +7,32 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
+import 'package:yacht_demo/calendar.dart';
+import 'package:yacht_demo/day-display.dart';
 
 import 'package:yacht_demo/main.dart';
+import 'package:yacht_demo/services/event-retriever.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Find today on the list', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyApp());
+    final cardFinder =
+        find.text(DateFormat('M-d').format(EventRetriever.today()));
+    expect(cardFinder, findsWidgets);
+
+    EventRetriever.addEvent(EventItem.of(
+        EventRetriever.today().add(Duration(hours: 4)),
+        EventRetriever.today().add(Duration(hours: 5)),
+        "testEvent"));
+
+    await tester.pumpWidget(EventInDaysDisplay(
+        begin: EventRetriever.today(),
+        end: EventRetriever.today().add(Duration(days: 1))));
+
+    final item = find.text("testEvent");
+
+    expect(item, findsOneWidget);
   });
 }
