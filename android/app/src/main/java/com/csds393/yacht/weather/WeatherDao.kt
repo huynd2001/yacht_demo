@@ -21,8 +21,11 @@ interface WeatherDao {
 
     /* Read */
 
-    @Query("SELECT * FROM daily_forecasts WHERE :earliest <= date <= :latest GROUP BY date")
-    fun _getWeather(earliest: LocalDate, latest: LocalDate): Map<LocalDate, DayWeather> = mapOf()
+    @Query("SELECT * FROM daily_forecasts WHERE :latitude == latitude AND :longitude == longitude ORDER BY date")
+    fun getWeather(latitude: Double, longitude: Double): List<DayWeather>
+
+    @Query("SELECT * FROM daily_forecasts ORDER BY date")
+    fun getAllWeather(): List<DayWeather>
 
     @Query("SELECT dateRetrieved FROM daily_forecasts WHERE date == :date")
     fun _getDateRetrievedForForecast(date: LocalDate): List<ZonedDateTime>

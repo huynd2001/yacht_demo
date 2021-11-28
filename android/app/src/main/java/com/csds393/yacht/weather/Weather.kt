@@ -8,46 +8,49 @@ import kotlinx.serialization.json.*
 import java.net.*
 import java.time.*
 import java.util.regex.Pattern
+import kotlin.math.round
 
 /** Will eventually become fleshed-out Weather Component of back-end */
 object Weather {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    private fun retrievableWeatherDays() = LocalDate.now()..(LocalDate.now().plusDays(6))
+    /*
+     One degree (of latitude) is about 85 km.
+     Want the broadest range where a forecast is still applicable
+     1km seems reasonable
+     So 85km/128 seems reasonable for precision.
+     log_2(128) == 7 bits
+    */
+    /** For Latitude and Longitude, how many bits of precision after the point. */
+    private val COORDINATE_PRECISION_IN_BITS = 7
 
+    private fun Double.roundToNumBits(precisionBits: Int) =
+            round(this.times(1 shl precisionBits)).div(1 shl precisionBits)
 
+    /** Given a [latitude] and [longitude], returns all  */
     fun getForecast(latitude: Double, longitude: Double): List<DayWeather> {
-        if (true) return retrieveForecastsForCoordinates(latitude, longitude)!!
-        val window = retrievableWeatherDays()
 
-        val weatherDao = DB.getInstance().weatherDao
-//         check db for entry of day
-        val dbResult = weatherDao._getWeather(window.start, window.endInclusive)
-        // if absent and internet available, fetch
+        // TODO: 11/28/2021  skip web query if last query was recent enough
+        // round coords
+        val lat = latitude.roundToNumBits(COORDINATE_PRECISION_IN_BITS)
+        val lon = longitude.roundToNumBits(COORDINATE_PRECISION_IN_BITS)
 
-        val missingDates = setOf(window).minus(dbResult.keys.toList())
-        // TODO: 11/18/2021 convert range to set, check whether missing set contains any from retrievable
-
-//        if (missingDates.contains(retrievableWeatherDays()))
-        // TODO: 11/18/2021 check for internet first
-
-        // if present and internet available, check if expired
-            // if so, update DB
-        // return contents of DB
-        val retrievedForecasts =  try {
-            val rf = retrieveForecastsForCoordinates(latitude, longitude)
+        val weatherDao = DB.getInstanceUnsafe().weatherDao
+        // attempt web query, update db
+        try {
+            val rf = retrieveForecastsForCoordinates(lat, lon)
             rf?.let {
                 weatherDao.insertForecasts(rf)
             }
-            rf
         } catch (e: Exception) {
-            emptyList()
         }
-        return retrievedForecasts?: emptyList()
+
+        // return db results
+        return weatherDao.getWeather(lat, lon)
     }
 
-    /** Prototype for Weather Component procedure of polling NWS and decoding JSON */
+    /** Polls NWS and and parses weather data into DayWeathers. Returns null on failure */
     private fun retrieveForecastsForCoordinates(latitude: Double, longitude: Double): List<DayWeather>? {
         val forecastURL = retrieveForecastURLFromPointsURL(composePointsURL(latitude, longitude), userAgent)
         val forecastJSON = forecastURL?.let { getResponseFromURL(it, userAgent) }
@@ -63,6 +66,9 @@ object Weather {
             val jsonHalfDayWeatherList = weatherElementList
                 .map<JsonElement, JsonHalfDayWeather> { json.decodeFromJsonElement(it) }
 
+            val lat = latitude.toFloat()
+            val lon = longitude.toFloat()
+
             val dayWeatherList = mutableListOf<DayWeather>()
             val iter = jsonHalfDayWeatherList.listIterator()
 
@@ -74,6 +80,8 @@ object Weather {
                 dayWeatherList.add(
                     DayWeather(
                         morningWeather.zonedDateTime.toLocalDate(),
+                        lat,
+                        lon,
                         dateTimeUpdated,
                         morningWeather.toHalfDayWeather(),
                         eveningWeather.toHalfDayWeather(),
@@ -99,8 +107,8 @@ object Weather {
 
     private fun getResponseFromURL(forecastUrl: URL, userAgent: String): String {
         val string = (forecastUrl.openConnection() as? HttpURLConnection)?.run {
-            readTimeout = 10000
-            connectTimeout = 15000
+            readTimeout = 2000
+            connectTimeout = 3000
             setRequestProperty("User-Agent", userAgent)
             requestMethod = "GET"
             doInput = true
@@ -163,10 +171,12 @@ private data class JsonHalfDayWeather(
 
 @Entity(
     tableName = "daily_forecasts",
-    primaryKeys = ["date"]
+    primaryKeys = ["date", "latitude", "longitude"]
 )
 data class DayWeather(
     val date: LocalDate,
+    val latitude: Float,
+    val longitude: Float,
     val dateRetrieved: ZonedDateTime,
     @Embedded(prefix = "day")
     val morningWeather: HalfDayWeather,
