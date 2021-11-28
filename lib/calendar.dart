@@ -50,10 +50,13 @@ class DateWidget extends StatefulWidget {
 }
 
 class CalendarDisplay extends State<DateWidget> {
+
+  static final DateTime MIN_DATE = DateTime(1000, 1, 1);
+  static final DateTime MAX_DATE = DateTime(3000, 12, 31);
+
   String formTaskName = "";
   DateTime formStartTime = DateTime.now();
   DateTime formEndTime = DateTime.now();
-
   final _formKey = GlobalKey<FormState>();
 
   void addEvent(EventItem e) {
@@ -147,22 +150,9 @@ class CalendarDisplay extends State<DateWidget> {
                                       onPressed: () {
                                         showDatePicker(
                                           context: context,
-                                          initialDate: DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day,
-                                              0,
-                                              0,
-                                              0),
-                                          lastDate: DateTime.now()
-                                              .add(Duration(days: 7)),
-                                          firstDate: DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day,
-                                              0,
-                                              0,
-                                              0),
+                                          initialDate: DateTime.now(),
+                                          firstDate: MIN_DATE,
+                                          lastDate: MAX_DATE,
                                         ).then((value) => {
                                               setState(() {
                                                 formStartTime =
@@ -209,22 +199,9 @@ class CalendarDisplay extends State<DateWidget> {
                                       onPressed: () {
                                         showDatePicker(
                                           context: context,
-                                          initialDate: DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day,
-                                              0,
-                                              0,
-                                              0),
-                                          lastDate: DateTime.now()
-                                              .add(Duration(days: 7)),
-                                          firstDate: DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day,
-                                              0,
-                                              0,
-                                              0),
+                                          initialDate: DateTime.now(),
+                                          lastDate: MIN_DATE,
+                                          firstDate: MAX_DATE,
                                         ).then((value) => {
                                               setState(() {
                                                 formEndTime =
