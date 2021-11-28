@@ -50,10 +50,13 @@ class DateWidget extends StatefulWidget {
 }
 
 class CalendarDisplay extends State<DateWidget> {
+
+  static final DateTime MIN_DATE = DateTime(1000, 1, 1);
+  static final DateTime MAX_DATE = DateTime(3000, 12, 31);
+
   String formTaskName = "";
   DateTime formStartTime = DateTime.now();
   DateTime formEndTime = DateTime.now();
-
   final _formKey = GlobalKey<FormState>();
 
   void addEvent(EventItem e) {
@@ -147,22 +150,9 @@ class CalendarDisplay extends State<DateWidget> {
                                       onPressed: () {
                                         showDatePicker(
                                           context: context,
-                                          initialDate: DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day,
-                                              0,
-                                              0,
-                                              0),
-                                          lastDate: DateTime.now()
-                                              .add(Duration(days: 7)),
-                                          firstDate: DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day,
-                                              0,
-                                              0,
-                                              0),
+                                          initialDate: DateTime.now(),
+                                          firstDate: MIN_DATE,
+                                          lastDate: MAX_DATE,
                                         ).then((value) => {
                                               setState(() {
                                                 formStartTime =
@@ -178,23 +168,20 @@ class CalendarDisplay extends State<DateWidget> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         showTimePicker(
-                                                context: context,
-                                                initialTime: TimeOfDay(
-                                                    hour: 0, minute: 0))
-                                            .then((value) => {
-                                                  setState(() {
-                                                    TimeOfDay time = value ??
-                                                        TimeOfDay.now();
-                                                    formStartTime =
-                                                        new DateTime(
-                                                            formStartTime.year,
-                                                            formStartTime.month,
-                                                            formStartTime.day,
-                                                            time.hour,
-                                                            time.minute);
-                                                  }),
-                                                  print(formStartTime),
-                                                });
+                                            context: context,
+                                            initialTime: TimeOfDay.now()
+                                        ).then((value) => {
+                                          setState(() {
+                                            TimeOfDay time = value ?? TimeOfDay.now();
+                                            formStartTime = new DateTime(
+                                                formStartTime.year,
+                                                formStartTime.month,
+                                                formStartTime.day,
+                                                time.hour,
+                                                time.minute);
+                                          }),
+                                          print(formStartTime),
+                                        });
                                       },
                                       child: Text('Start Time'),
                                     ),
@@ -209,22 +196,9 @@ class CalendarDisplay extends State<DateWidget> {
                                       onPressed: () {
                                         showDatePicker(
                                           context: context,
-                                          initialDate: DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day,
-                                              0,
-                                              0,
-                                              0),
-                                          lastDate: DateTime.now()
-                                              .add(Duration(days: 7)),
-                                          firstDate: DateTime(
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day,
-                                              0,
-                                              0,
-                                              0),
+                                          initialDate: DateTime.now(),
+                                          firstDate: MAX_DATE,
+                                          lastDate: MIN_DATE,
                                         ).then((value) => {
                                               setState(() {
                                                 formEndTime =
@@ -240,22 +214,20 @@ class CalendarDisplay extends State<DateWidget> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         showTimePicker(
-                                                context: context,
-                                                initialTime: TimeOfDay(
-                                                    hour: 0, minute: 0))
-                                            .then((value) => {
-                                                  setState(() {
-                                                    TimeOfDay time = value ??
-                                                        TimeOfDay.now();
-                                                    formEndTime = new DateTime(
-                                                        formEndTime.year,
-                                                        formEndTime.month,
-                                                        formEndTime.day,
-                                                        time.hour,
-                                                        time.minute);
-                                                  }),
-                                                  print(formEndTime),
-                                                });
+                                            context: context,
+                                            initialTime: TimeOfDay.now()
+                                        ).then((value) => {
+                                          setState(() {
+                                            TimeOfDay time = value ?? TimeOfDay.now();
+                                            formEndTime = new DateTime(
+                                                formEndTime.year,
+                                                formEndTime.month,
+                                                formEndTime.day,
+                                                time.hour,
+                                                time.minute);
+                                          }),
+                                          print(formEndTime),
+                                        });
                                       },
                                       child: Text('End Time'),
                                     ),
