@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import com.csds393.yacht.weather.DayWeather;
 import com.csds393.yacht.weather.HalfDayWeather;
 import com.csds393.yacht.weather.Weather;
+import com.csds393.yacht.database.DB;
 import java.util.Random;
 
 import java.time.LocalDate;
@@ -105,6 +106,7 @@ public class MainActivity extends FlutterActivity {
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
+        DB.initializeDB(this.getApplicationContext());
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
             .setMethodCallHandler(
             (call, result) -> {
@@ -114,14 +116,7 @@ public class MainActivity extends FlutterActivity {
                         String end = call.argument("end");
 
                          new CallAPITask(start, end, result).execute(new Pair<>(41.499321f, -81.694359f));
-                    //    Map<String, String> results = new HashMap<>();
-                    //    Random rand = new Random(start.hashCode());
-                    //    results.put("startTime", start);
-                    //    results.put("endTime", end);
-                    //    results.put("temp", String.valueOf(rand.nextInt(4)-2 + 43));
-                    //    results.put("weather", "foggyday");
-                    //    results.put("windSpeed", String.valueOf(rand.nextInt(4)-2 + 18));
-                    //    result.success(results);
+
                         break;
                     case "getEvent":
                         break;
