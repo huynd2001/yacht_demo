@@ -36,7 +36,7 @@ object Weather {
         val lat = latitude.roundToNumBits(COORDINATE_PRECISION_IN_BITS)
         val lon = longitude.roundToNumBits(COORDINATE_PRECISION_IN_BITS)
 
-        val weatherDao = DB.getInstanceUnsafe().weatherDao
+        val weatherDao = DB.getInstance().weatherDao
         // attempt web query, update db
         try {
             val rf = retrieveForecastsForCoordinates(lat, lon)

@@ -37,19 +37,14 @@ abstract class DB : RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: DB? = null
 
+        @JvmStatic
         fun initializeDB(context: Context) {
-            INSTANCE ?: buildDatabase(context)
+            if (INSTANCE == null) INSTANCE = buildDatabase(context)
         }
 
         /** Must have called initializeDB prior */
-        fun getInstance() = INSTANCE!!
-
-        /** Initializes if necessary, returns DB */
-        fun getInstance(context: Context): DB = synchronized(this) {
-            INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
-        }
-
-        // TODO: 11/18/2021  separate initialize from retrieve. so that other components can access DB
+        @JvmStatic
+        fun getInstance(): DB = INSTANCE!!
 
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext, DB::class.java, "yacht.db")
