@@ -5,10 +5,11 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
+import com.csds393.yacht.database.DB;
+import com.csds393.yacht.settings.Settings;
 import com.csds393.yacht.weather.DayWeather;
 import com.csds393.yacht.weather.HalfDayWeather;
 import com.csds393.yacht.weather.Weather;
-import com.csds393.yacht.database.DB;
 import java.util.Random;
 
 import java.time.LocalDate;
@@ -107,6 +108,7 @@ public class MainActivity extends FlutterActivity {
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
         DB.initializeDB(this.getApplicationContext());
+        Settings.init(this.getApplicationContext());
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
             .setMethodCallHandler(
             (call, result) -> {
