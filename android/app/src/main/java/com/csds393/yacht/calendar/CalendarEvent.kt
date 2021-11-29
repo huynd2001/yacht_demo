@@ -16,7 +16,7 @@ data class CalendarEvent internal constructor(
     val endTime: LocalTime? = null,
     @Embedded
     val details: Details,
-    @PrimaryKey val id: Int? = null
+    @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) : Comparable<CalendarEvent> {
     /**
      * Returns a negative integer, zero, or a positive integer as this CalendarEvent
@@ -72,7 +72,7 @@ data class CalendarEvent internal constructor(
                         map.getValue("label"),
                         map["description"]?:""
                 ),
-                map["id"]?.let { Integer.parseInt(it) }
+                map["id"]?.let { java.lang.Long.parseLong(it) }
         )
     }
 

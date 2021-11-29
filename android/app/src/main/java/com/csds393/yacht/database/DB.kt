@@ -1,17 +1,9 @@
 package com.csds393.yacht.database
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.csds393.yacht.calendar.CalendarDao
-import com.csds393.yacht.calendar.CalendarEvent
-import com.csds393.yacht.calendar.DatePattern
-import com.csds393.yacht.calendar.RecurringCalendarEvent
-import com.csds393.yacht.weather.DayWeather
-import com.csds393.yacht.weather.HalfDayWeather
-import com.csds393.yacht.weather.WeatherDao
+import androidx.room.*
+import com.csds393.yacht.calendar.*
+import com.csds393.yacht.weather.*
 
 /**
  * SQL Database that stores Calendar data and Weather forecasts
@@ -22,8 +14,10 @@ import com.csds393.yacht.weather.WeatherDao
         RecurringCalendarEvent::class,
         RecurringCalendarEvent.Exception::class,
         DayWeather::class,
+        Task::class,
+        EventAndTask::class,
                ],
-    version = 5,
+    version = 8,
     exportSchema = false)
 @TypeConverters(Converters::class, DatePattern::class)
 abstract class DB : RoomDatabase() {
