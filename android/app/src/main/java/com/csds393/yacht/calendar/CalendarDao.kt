@@ -19,10 +19,22 @@ interface CalendarDao {
     @Insert(onConflict = ABORT)
     fun _addExceptionForEvent(exception: RecurringCalendarEvent.Exception)
 
-    /* Read */
 
-    @Query("SELECT * FROM normal_events WHERE startDate <= :date <= endDate")
-    fun getEventsOnDay(date: LocalDate): List<CalendarEvent>
+    @Insert
+    fun __insertTask(task: Task): Long
+
+    @Insert(onConflict = ABORT)
+    fun associateTaskWithEvent(eventAndTask: EventAndTask)
+
+    @Transaction
+    fun insertTask(name: String, eventID: Long) {
+        println("here")
+        val taskID = __insertTask(Task(name))
+        associateTaskWithEvent(EventAndTask(eventID, taskID))
+    }
+
+
+    /* Read */
 
     @Query("SELECT * FROM normal_events where :earliest <= startDate <= :latest")
     fun getEventsStartingInDateWindow(earliest: LocalDate, latest: LocalDate): List<CalendarEvent>
@@ -30,17 +42,25 @@ interface CalendarDao {
     fun getEventsStartingInDateTimeWindow(earliest: LocalDateTime, latest: LocalDateTime) =
             getEventsStartingInDateWindow(earliest.toLocalDate(), latest.toLocalDate())
 
-    @Query("SELECT * FROM normal_events WHERE label = :label LIMIT :limit")
-    fun getAllWithLabel(label: String, limit: Int = 1): List<CalendarEvent>
+    @Query("SELECT * FROM tasks WHERE taskID in (SELECT taskID FROM event_task_table WHERE eventID == :eventID)")
+    fun getTasksForEvent(eventID: Long): List<Task>
 
-    @Query("SELECT label FROM normal_events WHERE :earliest <= startDate <= :latest")
-    fun getLabelsInDateRange(earliest: LocalDate, latest: LocalDate): List<String>
+    @Transaction
+    fun getTasksForEventAsMap(eventID: Long): List<Map<String, String>> =
+            getTasksForEvent(eventID).map {
+                buildMap(capacity = 3) {
+                    put("name", it.name)
+                    put("completed", it.completed.toString())
+                    put("taskID", it.taskID.toString())
+                }
+            }
+
 
     @Query("SELECT * FROM recurring_events")
     fun _getRecurringEvents(): List<RecurringCalendarEvent>
 
     @Query("SELECT date FROM recurrence_exceptions WHERE event_id = :id")
-    fun _getExceptionsForEvent(id: Int): List<LocalDate>
+    fun _getExceptionsForEvent(id: Long): List<LocalDate>
 
     @Transaction // in newer versions of Room, this can be replaced with multimap return type
     fun getRecurringEventsWithExceptions() =
@@ -77,7 +97,7 @@ interface CalendarDao {
     }
 
     @Query("DELETE FROM recurrence_exceptions WHERE event_id == :recurringCalendarEventID")
-    fun deleteAllExceptionsForRecurringEvent(recurringCalendarEventID: Int)
+    fun deleteAllExceptionsForRecurringEvent(recurringCalendarEventID: Long)
 
     @Delete
     fun _deleteEvent(event: RecurringCalendarEvent)

@@ -15,9 +15,9 @@ import com.csds393.yacht.weather.*
         RecurringCalendarEvent.Exception::class,
         DayWeather::class,
         Task::class,
-        EventTaskList::class,
+        EventAndTask::class,
                ],
-    version = 6,
+    version = 8,
     exportSchema = false)
 @TypeConverters(Converters::class, DatePattern::class)
 abstract class DB : RoomDatabase() {
