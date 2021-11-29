@@ -50,6 +50,32 @@ data class CalendarEvent internal constructor(
         return details.compareTo(other.details)
     }
 
+    /** Returns a map of fieldName:fieldAsString */
+    fun toMap() = buildMap {
+        put("startDate", startDate.toString())
+        startTime?.let { put("startTime", it.toString()) }
+        put("endDate", endDate.toString())
+        endTime?.let { put("endTime", it.toString()) }
+        put("id", id.toString())
+        put("label", details.label)
+        put("description", details.description)
+    }
+
+    companion object {
+        /** Converts a String:String map into a CalendarEvent */
+        fun fromMap(map: Map<String, String>) = CalendarEvent(
+                LocalDate.parse(map.getValue("startDate")),
+                map["startTime"]?.let { LocalTime.parse(it) },
+                LocalDate.parse(map.getValue("endDate")),
+                map["endTime"]?.let { LocalTime.parse(it) },
+                Details(
+                        map.getValue("label"),
+                        map["description"]?:""
+                ),
+                Integer.parseInt(map.getValue("id"))
+        )
+    }
+
     // TODO: 10/26/2021  probably migrate Icon to resource reference (URI? Int?)
     /**
      * Encapsulates the non-temporal attributes of a CalendarEvent.
