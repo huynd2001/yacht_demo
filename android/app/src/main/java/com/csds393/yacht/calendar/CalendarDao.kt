@@ -3,6 +3,7 @@ package com.csds393.yacht.calendar
 import androidx.room.*
 import androidx.room.OnConflictStrategy.ABORT
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Dao
 interface CalendarDao {
@@ -20,6 +21,15 @@ interface CalendarDao {
 
     /* Read */
 
+    @Query("SELECT * FROM normal_events WHERE startDate <= :date <= endDate")
+    fun getEventsOnDay(date: LocalDate): List<CalendarEvent>
+
+    @Query("SELECT * FROM normal_events where :earliest <= startDate <= :latest")
+    fun getEventsStartingInDateWindow(earliest: LocalDate, latest: LocalDate): List<CalendarEvent>
+
+    fun getEventsStartingInDateTimeWindow(earliest: LocalDateTime, latest: LocalDateTime) =
+            getEventsStartingInDateWindow(earliest.toLocalDate(), latest.toLocalDate())
+
     @Query("SELECT * FROM normal_events WHERE label = :label LIMIT :limit")
     fun getAllWithLabel(label: String, limit: Int = 1): List<CalendarEvent>
 
@@ -34,8 +44,8 @@ interface CalendarDao {
 
     @Transaction // in newer versions of Room, this can be replaced with multimap return type
     fun getRecurringEventsWithExceptions() =
-        // RecCalEvents retrieved from database guaranteed to have non-null rec_id
-        _getRecurringEvents().associateWith { _getExceptionsForEvent(it.rec_id!!) }
+            // RecCalEvents retrieved from database guaranteed to have non-null rec_id
+            _getRecurringEvents().associateWith { _getExceptionsForEvent(it.rec_id!!) }
 
 
     /* Update */
