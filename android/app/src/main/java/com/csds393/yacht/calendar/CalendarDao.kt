@@ -28,7 +28,6 @@ interface CalendarDao {
 
     @Transaction
     fun insertTask(name: String, eventID: Long) {
-        println("here")
         val taskID = __insertTask(Task(name))
         associateTaskWithEvent(EventAndTask(eventID, taskID))
     }
@@ -75,6 +74,9 @@ interface CalendarDao {
 
     @Update
     fun updateEvent(event: RecurringCalendarEvent)
+
+    @Update
+    fun updateTask(task: Task)
 
 
     /* Delete */

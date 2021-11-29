@@ -16,7 +16,7 @@ data class CalendarEvent internal constructor(
     val endTime: LocalTime? = null,
     @Embedded
     val details: Details,
-    @PrimaryKey(autogenerate = true) val id: Long? = null
+    @PrimaryKey(autoGenerate = true) val id: Long? = null
 ) : Comparable<CalendarEvent> {
     /**
      * Returns a negative integer, zero, or a positive integer as this CalendarEvent
