@@ -72,7 +72,7 @@ data class CalendarEvent internal constructor(
                         map.getValue("label"),
                         map["description"]?:""
                 ),
-                Integer.parseInt(map.getValue("id"))
+                map["id"]?.let { Integer.parseInt(it) }
         )
     }
 
