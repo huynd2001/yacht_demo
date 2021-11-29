@@ -206,10 +206,10 @@ public final class WeatherDao_Impl implements WeatherDao {
           _tmp = _cursor.getInt(_cursorIndexOfDate);
         }
         _tmpDate = Converters.intToLocalDate(_tmp);
-        final float _tmpLatitude;
-        _tmpLatitude = _cursor.getFloat(_cursorIndexOfLatitude);
-        final float _tmpLongitude;
-        _tmpLongitude = _cursor.getFloat(_cursorIndexOfLongitude);
+        final double _tmpLatitude;
+        _tmpLatitude = _cursor.getDouble(_cursorIndexOfLatitude);
+        final double _tmpLongitude;
+        _tmpLongitude = _cursor.getDouble(_cursorIndexOfLongitude);
         final ZonedDateTime _tmpDateRetrieved;
         final Long _tmp_1;
         if (_cursor.isNull(_cursorIndexOfDateRetrieved)) {
@@ -320,10 +320,10 @@ public final class WeatherDao_Impl implements WeatherDao {
           _tmp = _cursor.getInt(_cursorIndexOfDate);
         }
         _tmpDate = Converters.intToLocalDate(_tmp);
-        final float _tmpLatitude;
-        _tmpLatitude = _cursor.getFloat(_cursorIndexOfLatitude);
-        final float _tmpLongitude;
-        _tmpLongitude = _cursor.getFloat(_cursorIndexOfLongitude);
+        final double _tmpLatitude;
+        _tmpLatitude = _cursor.getDouble(_cursorIndexOfLatitude);
+        final double _tmpLongitude;
+        _tmpLongitude = _cursor.getDouble(_cursorIndexOfLongitude);
         final ZonedDateTime _tmpDateRetrieved;
         final Long _tmp_1;
         if (_cursor.isNull(_cursorIndexOfDateRetrieved)) {
