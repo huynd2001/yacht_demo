@@ -23,7 +23,7 @@ object Weather {
      log_2(128) == 7 bits
     */
     /** For Latitude and Longitude, how many bits of precision after the point. */
-    private val COORDINATE_PRECISION_IN_BITS = 7
+    private const val COORDINATE_PRECISION_IN_BITS = 7
 
     private fun Double.roundToNumBits(precisionBits: Int) =
             round(this.times(1 shl precisionBits)).div(1 shl precisionBits)
@@ -66,9 +66,6 @@ object Weather {
             val jsonHalfDayWeatherList = weatherElementList
                 .map<JsonElement, JsonHalfDayWeather> { json.decodeFromJsonElement(it) }
 
-            val lat = latitude.toFloat()
-            val lon = longitude.toFloat()
-
             val dayWeatherList = mutableListOf<DayWeather>()
             val iter = jsonHalfDayWeatherList.listIterator()
 
@@ -80,8 +77,8 @@ object Weather {
                 dayWeatherList.add(
                     DayWeather(
                         morningWeather.zonedDateTime.toLocalDate(),
-                        lat,
-                        lon,
+                        latitude,
+                        longitude,
                         dateTimeUpdated,
                         morningWeather.toHalfDayWeather(),
                         eveningWeather.toHalfDayWeather(),
@@ -93,7 +90,7 @@ object Weather {
 
     }
 
-    val userAgent = "YACHT calendar app"
+    private const val userAgent = "YACHT calendar app"
 
     private fun composePointsURL(latitude: Double, longitude: Double) =
         URL(String.format("https://api.weather.gov/points/%.3f,%.3f", latitude,longitude))
@@ -175,8 +172,8 @@ private data class JsonHalfDayWeather(
 )
 data class DayWeather(
     val date: LocalDate,
-    val latitude: Float,
-    val longitude: Float,
+    val latitude: Double,
+    val longitude: Double,
     val dateRetrieved: ZonedDateTime,
     @Embedded(prefix = "day")
     val morningWeather: HalfDayWeather,

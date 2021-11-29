@@ -168,9 +168,9 @@ public final class DB_Impl extends DB {
       }
     }, "cbc5dc7df198ececf9ea1428215c1dd5", "4910657fc6c8143fff8cff318589e34c");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(configuration.context)
-        .name(configuration.name)
-        .callback(_openCallback)
-        .build();
+            .name(configuration.name)
+            .callback(_openCallback)
+            .build();
     final SupportSQLiteOpenHelper _helper = configuration.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
   }

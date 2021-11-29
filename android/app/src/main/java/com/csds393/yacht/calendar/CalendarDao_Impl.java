@@ -17,6 +17,7 @@ import java.lang.Override;
 import java.lang.String;
 import java.lang.SuppressWarnings;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -616,6 +617,197 @@ public final class CalendarDao_Impl implements CalendarDao {
   }
 
   @Override
+  public List<CalendarEvent> getEventsOnDay(final LocalDate date) {
+    final String _sql = "SELECT * FROM normal_events WHERE startDate <= ? <= endDate";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    final Integer _tmp;
+    _tmp = Converters.localDateToInt(date);
+    if (_tmp == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp);
+    }
+    __db.assertNotSuspendingTransaction();
+    final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+    try {
+      final int _cursorIndexOfStartDate = CursorUtil.getColumnIndexOrThrow(_cursor, "startDate");
+      final int _cursorIndexOfStartTime = CursorUtil.getColumnIndexOrThrow(_cursor, "startTime");
+      final int _cursorIndexOfEndDate = CursorUtil.getColumnIndexOrThrow(_cursor, "endDate");
+      final int _cursorIndexOfEndTime = CursorUtil.getColumnIndexOrThrow(_cursor, "endTime");
+      final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+      final int _cursorIndexOfLabel = CursorUtil.getColumnIndexOrThrow(_cursor, "label");
+      final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+      final List<CalendarEvent> _result = new ArrayList<CalendarEvent>(_cursor.getCount());
+      while(_cursor.moveToNext()) {
+        final CalendarEvent _item;
+        final LocalDate _tmpStartDate;
+        final Integer _tmp_1;
+        if (_cursor.isNull(_cursorIndexOfStartDate)) {
+          _tmp_1 = null;
+        } else {
+          _tmp_1 = _cursor.getInt(_cursorIndexOfStartDate);
+        }
+        _tmpStartDate = Converters.intToLocalDate(_tmp_1);
+        final LocalTime _tmpStartTime;
+        final Long _tmp_2;
+        if (_cursor.isNull(_cursorIndexOfStartTime)) {
+          _tmp_2 = null;
+        } else {
+          _tmp_2 = _cursor.getLong(_cursorIndexOfStartTime);
+        }
+        _tmpStartTime = Converters.longToLocalTime(_tmp_2);
+        final LocalDate _tmpEndDate;
+        final Integer _tmp_3;
+        if (_cursor.isNull(_cursorIndexOfEndDate)) {
+          _tmp_3 = null;
+        } else {
+          _tmp_3 = _cursor.getInt(_cursorIndexOfEndDate);
+        }
+        _tmpEndDate = Converters.intToLocalDate(_tmp_3);
+        final LocalTime _tmpEndTime;
+        final Long _tmp_4;
+        if (_cursor.isNull(_cursorIndexOfEndTime)) {
+          _tmp_4 = null;
+        } else {
+          _tmp_4 = _cursor.getLong(_cursorIndexOfEndTime);
+        }
+        _tmpEndTime = Converters.longToLocalTime(_tmp_4);
+        final Integer _tmpId;
+        if (_cursor.isNull(_cursorIndexOfId)) {
+          _tmpId = null;
+        } else {
+          _tmpId = _cursor.getInt(_cursorIndexOfId);
+        }
+        final CalendarEvent.Details _tmpDetails;
+        if (! (_cursor.isNull(_cursorIndexOfLabel) && _cursor.isNull(_cursorIndexOfDescription))) {
+          final String _tmpLabel;
+          if (_cursor.isNull(_cursorIndexOfLabel)) {
+            _tmpLabel = null;
+          } else {
+            _tmpLabel = _cursor.getString(_cursorIndexOfLabel);
+          }
+          final String _tmpDescription;
+          if (_cursor.isNull(_cursorIndexOfDescription)) {
+            _tmpDescription = null;
+          } else {
+            _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+          }
+          _tmpDetails = new CalendarEvent.Details(_tmpLabel,_tmpDescription);
+        }  else  {
+          _tmpDetails = null;
+        }
+        _item = new CalendarEvent(_tmpStartDate,_tmpStartTime,_tmpEndDate,_tmpEndTime,_tmpDetails,_tmpId);
+        _result.add(_item);
+      }
+      return _result;
+    } finally {
+      _cursor.close();
+      _statement.release();
+    }
+  }
+
+  @Override
+  public List<CalendarEvent> getEventsStartingInDateWindow(final LocalDate earliest,
+                                                           final LocalDate latest) {
+    final String _sql = "SELECT * FROM normal_events where ? <= startDate <= ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);
+    int _argIndex = 1;
+    final Integer _tmp;
+    _tmp = Converters.localDateToInt(earliest);
+    if (_tmp == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp);
+    }
+    _argIndex = 2;
+    final Integer _tmp_1;
+    _tmp_1 = Converters.localDateToInt(latest);
+    if (_tmp_1 == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindLong(_argIndex, _tmp_1);
+    }
+    __db.assertNotSuspendingTransaction();
+    final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+    try {
+      final int _cursorIndexOfStartDate = CursorUtil.getColumnIndexOrThrow(_cursor, "startDate");
+      final int _cursorIndexOfStartTime = CursorUtil.getColumnIndexOrThrow(_cursor, "startTime");
+      final int _cursorIndexOfEndDate = CursorUtil.getColumnIndexOrThrow(_cursor, "endDate");
+      final int _cursorIndexOfEndTime = CursorUtil.getColumnIndexOrThrow(_cursor, "endTime");
+      final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+      final int _cursorIndexOfLabel = CursorUtil.getColumnIndexOrThrow(_cursor, "label");
+      final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+      final List<CalendarEvent> _result = new ArrayList<CalendarEvent>(_cursor.getCount());
+      while(_cursor.moveToNext()) {
+        final CalendarEvent _item;
+        final LocalDate _tmpStartDate;
+        final Integer _tmp_2;
+        if (_cursor.isNull(_cursorIndexOfStartDate)) {
+          _tmp_2 = null;
+        } else {
+          _tmp_2 = _cursor.getInt(_cursorIndexOfStartDate);
+        }
+        _tmpStartDate = Converters.intToLocalDate(_tmp_2);
+        final LocalTime _tmpStartTime;
+        final Long _tmp_3;
+        if (_cursor.isNull(_cursorIndexOfStartTime)) {
+          _tmp_3 = null;
+        } else {
+          _tmp_3 = _cursor.getLong(_cursorIndexOfStartTime);
+        }
+        _tmpStartTime = Converters.longToLocalTime(_tmp_3);
+        final LocalDate _tmpEndDate;
+        final Integer _tmp_4;
+        if (_cursor.isNull(_cursorIndexOfEndDate)) {
+          _tmp_4 = null;
+        } else {
+          _tmp_4 = _cursor.getInt(_cursorIndexOfEndDate);
+        }
+        _tmpEndDate = Converters.intToLocalDate(_tmp_4);
+        final LocalTime _tmpEndTime;
+        final Long _tmp_5;
+        if (_cursor.isNull(_cursorIndexOfEndTime)) {
+          _tmp_5 = null;
+        } else {
+          _tmp_5 = _cursor.getLong(_cursorIndexOfEndTime);
+        }
+        _tmpEndTime = Converters.longToLocalTime(_tmp_5);
+        final Integer _tmpId;
+        if (_cursor.isNull(_cursorIndexOfId)) {
+          _tmpId = null;
+        } else {
+          _tmpId = _cursor.getInt(_cursorIndexOfId);
+        }
+        final CalendarEvent.Details _tmpDetails;
+        if (! (_cursor.isNull(_cursorIndexOfLabel) && _cursor.isNull(_cursorIndexOfDescription))) {
+          final String _tmpLabel;
+          if (_cursor.isNull(_cursorIndexOfLabel)) {
+            _tmpLabel = null;
+          } else {
+            _tmpLabel = _cursor.getString(_cursorIndexOfLabel);
+          }
+          final String _tmpDescription;
+          if (_cursor.isNull(_cursorIndexOfDescription)) {
+            _tmpDescription = null;
+          } else {
+            _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+          }
+          _tmpDetails = new CalendarEvent.Details(_tmpLabel,_tmpDescription);
+        }  else  {
+          _tmpDetails = null;
+        }
+        _item = new CalendarEvent(_tmpStartDate,_tmpStartTime,_tmpEndDate,_tmpEndTime,_tmpDetails,_tmpId);
+        _result.add(_item);
+      }
+      return _result;
+    } finally {
+      _cursor.close();
+      _statement.release();
+    }
+  }
+
+  @Override
   public List<CalendarEvent> getAllWithLabel(final String label, final int limit) {
     final String _sql = "SELECT * FROM normal_events WHERE label = ? LIMIT ?";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);
@@ -882,6 +1074,12 @@ public final class CalendarDao_Impl implements CalendarDao {
       _cursor.close();
       _statement.release();
     }
+  }
+
+  @Override
+  public List<CalendarEvent> getEventsStartingInDateTimeWindow(final LocalDateTime earliest,
+                                                               final LocalDateTime latest) {
+    return CalendarDao.DefaultImpls.getEventsStartingInDateTimeWindow(CalendarDao_Impl.this, earliest, latest);
   }
 
   public static List<Class<?>> getRequiredConverters() {
