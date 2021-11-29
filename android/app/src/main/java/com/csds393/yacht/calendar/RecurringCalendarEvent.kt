@@ -17,7 +17,7 @@ data class RecurringCalendarEvent(
     val activeWindow: ClosedRange<LocalDate>,
     val datePattern: DatePattern,
     @PrimaryKey(autoGenerate = true)
-    val rec_id: Int? = null,
+    val rec_id: Long? = null,
 ) {
     @delegate:Ignore
     private val duration: Period by lazy { with(eventBase) { startDate.until(endDate) } }
@@ -39,18 +39,18 @@ data class RecurringCalendarEvent(
         return !soonestDate.isAfter(latestDate)
     }
     @Entity(
-        tableName = "recurrence_exceptions",
-        primaryKeys = ["date", "event_id"],
-//        TODO refactor s.t. foreign-key constraint is upheld
-//        foreignKeys = [ForeignKey(
-//            entity = RecurringCalendarEvent::class,
-//            parentColumns = ["id"],
-//            childColumns = ["event_id"],
-//            onUpdate = CASCADE,
-//            onDelete = CASCADE,
-//        )]
+       tableName = "recurrence_exceptions",
+       primaryKeys = ["date", "event_id"],
+       indices = [Index(value=["event_id"])],
+       foreignKeys = [ForeignKey(
+               entity = RecurringCalendarEvent::class,
+               parentColumns = ["rec_id"],
+               childColumns = ["event_id"],
+               onUpdate = CASCADE,
+               onDelete = CASCADE,
+       )]
     )
     /** An excluded [date] for a recurring event */
-    data class Exception(val date: LocalDate, val event_id: Int)
+    data class Exception(val date: LocalDate, val event_id: Long)
 
 }
