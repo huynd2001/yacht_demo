@@ -1,6 +1,38 @@
 import 'package:flutter/services.dart';
 
-import '../calendar.dart';
+class EventItem {
+  final DateTime startTime;
+  final DateTime endTime;
+  final String description;
+  final String label;
+  final int? id;
+  static int eventIdTracking = 0;
+
+  const EventItem._(
+      this.startTime, this.endTime, this.label, this.description, this.id);
+
+  static EventItem of(
+      DateTime startTime, DateTime endTime, String label, String description) {
+    eventIdTracking++;
+    return new EventItem._(
+        startTime, endTime, label, description, eventIdTracking);
+  }
+
+  EventItem.fromJson(Map<String, String> json)
+      : startTime = DateTime.parse(json['startTime'].toString()),
+        endTime = DateTime.parse(json['endTime'].toString()),
+        description = json['description'].toString(),
+        label = json['label'].toString(),
+        id = int.parse(json['id'] ?? "-1");
+
+  Map<String, String> toJson() => {
+        'startTime': startTime.toIso8601String(),
+        'endTime': endTime.toIso8601String(),
+        'label': label,
+        'description': description,
+        'id': id.toString()
+      };
+}
 
 class EventRetriever {
   static const eventRetriever = MethodChannel('calendar/events');
@@ -10,8 +42,8 @@ class EventRetriever {
   static DateTime today() => new DateTime(
       DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
 
-  static void init() async {
-    List<String> normalEvents = await eventRetriever.invokeMethod('getEvents');
+  static void init() {
+    // List<String> normalEvents = await eventRetriever.invokeMethod('getEvents');
   }
 
   static List<EventItem> retrieveEvents(bool test(EventItem e)) {
@@ -27,9 +59,15 @@ class EventRetriever {
     _events.remove(reEvent);
   }
 
-  static List<EventItem> retrieveEventFromStartEnd(
-      DateTime start, DateTime end) {
-    return retrieveEvents(
-        (e) => start.isBefore(e.startTime) && end.isAfter(e.startTime));
+  static Future<List<EventItem>> retrieveEventFromStartEnd(
+      DateTime start, DateTime end) async {
+    List<Map<String, String>> results = await eventRetriever.invokeMethod(
+        'getEvents', <String, String>{
+      'start': start.toIso8601String(),
+      'end': end.toIso8601String()
+    });
+    List<Map<String, String>> eventsJson =
+        results.map((e) => Map<String, String>.from(e)).toList();
+    return eventsJson.map((e) => EventItem.fromJson(e)).toList();
   }
 }

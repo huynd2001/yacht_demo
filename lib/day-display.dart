@@ -23,7 +23,7 @@ class EventDisplay extends StatelessWidget {
               children: <Widget>[
                 ListTile(
                   leading: Icon(Icons.lightbulb),
-                  title: Text(event.task),
+                  title: Text(event.description),
                   subtitle: Text(
                       DateFormat('h:mm a', 'en_US').format(event.startTime) +
                           ' - ' +
@@ -38,7 +38,7 @@ class EventDisplay extends StatelessWidget {
   }
 }
 
-class EventInDaysDisplay extends StatelessWidget {
+class EventInDaysDisplay extends StatefulWidget {
   final DateTime begin;
   final DateTime end;
 
@@ -46,13 +46,20 @@ class EventInDaysDisplay extends StatelessWidget {
       : super(key: key);
 
   @override
+  _EventInDaysDisplayState createState() => _EventInDaysDisplayState();
+}
+
+class _EventInDaysDisplayState extends State<EventInDaysDisplay> {
+  List<EventItem> events = List.empty(growable: true);
+
+  @override
   Widget build(BuildContext context) {
-    List<EventItem> events =
-        EventRetriever.retrieveEventFromStartEnd(begin, end);
+    EventRetriever.retrieveEventFromStartEnd(widget.begin, widget.end)
+        .then((value) => setState(() => events.addAll(value)));
 
     return Column(
       children: [
-        Text(DateFormat('EEE, MMM d').format(begin)),
+        Text(DateFormat('EEE, MMM d').format(widget.begin)),
         Divider(color: Colors.black),
         ConstrainedBox(
             constraints: new BoxConstraints(

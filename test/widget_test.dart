@@ -25,6 +25,7 @@ void main() {
     EventRetriever.addEvent(EventItem.of(
         EventRetriever.today().add(Duration(hours: 4)),
         EventRetriever.today().add(Duration(hours: 5)),
+        "",
         "testEvent"));
 
     await tester.pumpWidget(EventInDaysDisplay(

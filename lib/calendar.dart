@@ -7,34 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:yacht_demo/day-display.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
 
-class EventItem {
-  final DateTime startTime;
-  final DateTime endTime;
-  final String task;
-  final int id;
-  static int eventIdTracking = 0;
-
-  const EventItem._(this.startTime, this.endTime, this.task, this.id);
-
-  static EventItem of(DateTime startTime, DateTime endTime, String task) {
-    eventIdTracking++;
-    return new EventItem._(startTime, endTime, task, eventIdTracking);
-  }
-
-  EventItem.fromJson(Map<String, String> json)
-      : startTime = DateTime.parse(json['startTime'].toString()),
-        endTime = DateTime.parse(json['endTime'].toString()),
-        task = json['task'].toString(),
-        id = int.parse(json['id'] ?? "-1");
-
-  Map<String, String> toJson() => {
-        'startTime': startTime.toIso8601String(),
-        'endTime': endTime.toIso8601String(),
-        'task': task,
-        'id': id.toString()
-      };
-}
-
 class DateItem {
   final DateTime startTime;
   final DateTime endTime;
@@ -43,14 +15,66 @@ class DateItem {
 }
 
 class DateWidget extends StatefulWidget {
-  const DateWidget({Key? key}) : super(key: key);
+  DateWidget({Key? key}) : super(key: key);
 
   @override
-  CalendarDisplay createState() => CalendarDisplay();
+  _CalendarDisplay createState() => _CalendarDisplay();
 }
 
-class CalendarDisplay extends State<DateWidget> {
+class CalendarItemDisplay extends StatefulWidget {
+  final DateTime startTime;
+  final DateTime endTime;
 
+  CalendarItemDisplay(
+      {Key? key, required this.startTime, required this.endTime})
+      : super(key: key);
+
+  @override
+  _CalendarItemDisplayState createState() => _CalendarItemDisplayState();
+}
+
+class _CalendarItemDisplayState extends State<CalendarItemDisplay> {
+  List<EventItem> events = List.empty(growable: true);
+
+  @override
+  Widget build(BuildContext context) {
+    EventRetriever.retrieveEventFromStartEnd(
+            this.widget.startTime, this.widget.endTime)
+        .then((value) => {events.addAll(value)});
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => DayDisplay(
+                    startDate: EventRetriever.today(),
+                  )),
+        );
+      },
+      child: Card(
+        child: Container(
+          width: 80,
+          height: 100,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+                  ListTile(
+                      title:
+                          Text(DateFormat('M-d').format(this.widget.startTime)),
+                      subtitle: Text(
+                        DateFormat('EEE').format(this.widget.startTime),
+                      ))
+                ] +
+                events.map((e) => Text(e.description)).take(4).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CalendarDisplay extends State<DateWidget> {
   static final DateTime MIN_DATE = DateTime(1000, 1, 1);
   static final DateTime MAX_DATE = DateTime(3000, 12, 31);
 
@@ -75,38 +99,7 @@ class CalendarDisplay extends State<DateWidget> {
             DateTime startTime =
                 EventRetriever.today().add(Duration(days: index));
             DateTime endTime = startTime.add(Duration(days: 1));
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => DayDisplay(
-                            startDate: EventRetriever.today(),
-                          )),
-                );
-              },
-              child: Card(
-                child: Container(
-                  width: 80,
-                  height: 100,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                          ListTile(
-                              title: Text(DateFormat('M-d').format(startTime)),
-                              subtitle: Text(
-                                DateFormat('EEE').format(startTime),
-                              ))
-                        ] +
-                        EventRetriever.retrieveEventFromStartEnd(
-                                startTime, endTime)
-                            .map((e) => Text(e.task))
-                            .take(4)
-                            .toList(),
-                  ),
-                ),
-              ),
-            );
+            return CalendarItemDisplay(startTime: startTime, endTime: endTime);
           },
           scrollDirection: Axis.horizontal,
           addAutomaticKeepAlives: false,
@@ -168,20 +161,22 @@ class CalendarDisplay extends State<DateWidget> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         showTimePicker(
-                                            context: context,
-                                            initialTime: TimeOfDay.now()
-                                        ).then((value) => {
-                                          setState(() {
-                                            TimeOfDay time = value ?? TimeOfDay.now();
-                                            formStartTime = new DateTime(
-                                                formStartTime.year,
-                                                formStartTime.month,
-                                                formStartTime.day,
-                                                time.hour,
-                                                time.minute);
-                                          }),
-                                          print(formStartTime),
-                                        });
+                                                context: context,
+                                                initialTime: TimeOfDay.now())
+                                            .then((value) => {
+                                                  setState(() {
+                                                    TimeOfDay time = value ??
+                                                        TimeOfDay.now();
+                                                    formStartTime =
+                                                        new DateTime(
+                                                            formStartTime.year,
+                                                            formStartTime.month,
+                                                            formStartTime.day,
+                                                            time.hour,
+                                                            time.minute);
+                                                  }),
+                                                  print(formStartTime),
+                                                });
                                       },
                                       child: Text('Start Time'),
                                     ),
@@ -214,20 +209,21 @@ class CalendarDisplay extends State<DateWidget> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         showTimePicker(
-                                            context: context,
-                                            initialTime: TimeOfDay.now()
-                                        ).then((value) => {
-                                          setState(() {
-                                            TimeOfDay time = value ?? TimeOfDay.now();
-                                            formEndTime = new DateTime(
-                                                formEndTime.year,
-                                                formEndTime.month,
-                                                formEndTime.day,
-                                                time.hour,
-                                                time.minute);
-                                          }),
-                                          print(formEndTime),
-                                        });
+                                                context: context,
+                                                initialTime: TimeOfDay.now())
+                                            .then((value) => {
+                                                  setState(() {
+                                                    TimeOfDay time = value ??
+                                                        TimeOfDay.now();
+                                                    formEndTime = new DateTime(
+                                                        formEndTime.year,
+                                                        formEndTime.month,
+                                                        formEndTime.day,
+                                                        time.hour,
+                                                        time.minute);
+                                                  }),
+                                                  print(formEndTime),
+                                                });
                                       },
                                       child: Text('End Time'),
                                     ),
@@ -245,7 +241,7 @@ class CalendarDisplay extends State<DateWidget> {
                                       print(this.formStartTime);
                                       print(this.formEndTime);
                                       addEvent(EventItem.of(formStartTime,
-                                          formEndTime, formTaskName));
+                                          formEndTime, '', formTaskName));
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
