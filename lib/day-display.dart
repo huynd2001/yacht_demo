@@ -23,7 +23,7 @@ class EventDisplay extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     leading: Icon(Icons.lightbulb),
-                    title: Text(event.description),
+                    title: Text(event.label),
                     subtitle: Text(DateFormat('h:mm a', 'en_US')
                             .format(event.startTime) +
                         ' - ' +
