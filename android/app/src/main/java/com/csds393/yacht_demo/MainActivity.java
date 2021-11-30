@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -156,7 +157,15 @@ public class MainActivity extends FlutterActivity {
                 return;
             }
 
-            result.success(events.stream().map(CalendarEvent::toMap));
+            result.success(events.stream().map(event -> {
+                Map<String, String> retMap = new HashMap<>();
+                retMap.put("startTime", event.getStartDate().atTime(event.getStartTime()).toString());
+                retMap.put("endTime", event.getEndDate().atTime(event.getEndTime()).toString());
+                retMap.put("label", event.getDetails().getLabel());
+                retMap.put("description", event.getDetails().getDescription());
+                retMap.put("id", Optional.ofNullable(event.getId()).orElse(-1L).toString());
+                return retMap;
+            }).collect(Collectors.toList()));
         }
     }
 
@@ -183,8 +192,8 @@ public class MainActivity extends FlutterActivity {
 
                 Map<String, String> newMap = new HashMap<>();
                 newMap.put("startDate", startDate.toLocalDate().toString());
-                newMap.put("endDate", endDate.toLocalTime().toString());
-                newMap.put("startTime", startDate.toLocalDate().toString());
+                newMap.put("endDate", endDate.toLocalDate().toString());
+                newMap.put("startTime", startDate.toLocalTime().toString());
                 newMap.put("endTime", endDate.toLocalTime().toString());
                 newMap.put("label", label);
                 newMap.put("description", description);

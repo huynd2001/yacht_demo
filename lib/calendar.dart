@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 import 'package:intl/intl.dart';
@@ -39,7 +40,14 @@ class _CalendarItemDisplayState extends State<CalendarItemDisplay> {
   gettingEvents() {
     EventRetriever.retrieveEventFromStartEnd(
             this.widget.startTime, this.widget.endTime)
-        .then((value) => {events = value});
+        .then((value) => {
+              if (!listEquals(events, value))
+                {
+                  setState(() {
+                    events = value;
+                  })
+                }
+            });
   }
 
   @override
@@ -83,14 +91,19 @@ class _CalendarDisplay extends State<DateWidget> {
   static final DateTime MAX_DATE = DateTime(3000, 12, 31);
 
   String formTaskName = "";
-  DateTime formStartTime = DateTime.now();
-  DateTime formEndTime = DateTime.now();
+  DateTime formStartTime = EventRetriever.today();
+  DateTime formEndTime = EventRetriever.today();
   final _formKey = GlobalKey<FormState>();
 
   void addEvent(
       DateTime startTime, DateTime endTime, String label, String description) {
     setState(() {
-      EventRetriever.createEvent(startTime, endTime, label, description);
+      EventRetriever.createEvent(startTime, endTime, label, description)
+          .then((value) => {
+                this.formEndTime = EventRetriever.today(),
+                this.formStartTime = EventRetriever.today(),
+                this.formTaskName = "",
+              });
     });
   }
 
@@ -197,8 +210,8 @@ class _CalendarDisplay extends State<DateWidget> {
                                         showDatePicker(
                                           context: context,
                                           initialDate: DateTime.now(),
-                                          firstDate: MAX_DATE,
-                                          lastDate: MIN_DATE,
+                                          firstDate: MIN_DATE,
+                                          lastDate: MAX_DATE,
                                         ).then((value) => {
                                               setState(() {
                                                 formEndTime =
@@ -242,9 +255,6 @@ class _CalendarDisplay extends State<DateWidget> {
                                   onPressed: () {
                                     if (_formKey.currentState!.validate()) {
                                       _formKey.currentState!.save();
-                                      print(this.formTaskName);
-                                      print(this.formStartTime);
-                                      print(this.formEndTime);
                                       addEvent(formStartTime, formEndTime, '',
                                           formTaskName);
                                       ScaffoldMessenger.of(context)
@@ -252,6 +262,7 @@ class _CalendarDisplay extends State<DateWidget> {
                                         const SnackBar(
                                             content: Text('Event Added!')),
                                       );
+                                      Navigator.pop(context);
                                     }
                                   },
                                 ),

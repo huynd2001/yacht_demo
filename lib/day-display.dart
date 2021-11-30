@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -52,52 +53,68 @@ class _EventInDaysDisplayState extends State<EventInDaysDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    EventRetriever.retrieveEventFromStartEnd(widget.begin, widget.end)
-        .then((value) => setState(() => events.addAll(value)));
+    EventRetriever.retrieveEventFromStartEnd(this.widget.begin, this.widget.end)
+        .then((value) => {
+              if (!listEquals(events, value))
+                {
+                  setState(() {
+                    events = value;
+                  })
+                }
+            });
 
-    return Column(
-      children: [
-        Text(DateFormat('EEE, MMM d').format(widget.begin)),
-        Divider(color: Colors.black),
-        ConstrainedBox(
-            constraints: new BoxConstraints(
-              minHeight: 50,
-            ),
-            child: ListView.builder(
-              itemBuilder: (_, index) {
-                return EventDisplay(event: events[index]);
-              },
-              itemCount: events.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-            ))
-      ],
-    );
+    return Column(children: [
+      Text(DateFormat('EEE, MMM d').format(widget.begin)),
+      Divider(color: Colors.black),
+      ConstrainedBox(
+          constraints: new BoxConstraints(
+            minHeight: 50,
+          ),
+          child: ListView(
+            addAutomaticKeepAlives: false,
+            children: events.map((e) => EventDisplay(event: e)).toList(),
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+          ))
+    ]);
   }
 }
 
-class DayDisplay extends StatefulWidget {
+class DayDisplay extends StatelessWidget {
   final DateTime startDate;
 
   const DayDisplay({Key? key, required this.startDate}) : super(key: key);
 
   @override
-  _DayDisplayState createState() => _DayDisplayState();
-}
-
-class _DayDisplayState extends State<DayDisplay> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.blue, title: const Text('Date View')),
-        body: InfiniteListView.builder(
+        body: ListView.builder(
             itemBuilder: (_, index) {
-              DateTime startTime =
-                  EventRetriever.today().add(Duration(days: index));
+              DateTime startTime = this.startDate.add(Duration(days: index));
               DateTime endTime = startTime.add(Duration(days: 1));
               return EventInDaysDisplay(begin: startTime, end: endTime);
             },
             addAutomaticKeepAlives: false));
   }
+
+  // @override
+  // _DayDisplayState createState() => _DayDisplayState();
 }
+
+// class _DayDisplayState extends State<DayDisplay> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//         appBar: AppBar(
+//             backgroundColor: Colors.blue, title: const Text('Date View')),
+//         body: ListView.builder(
+//             itemBuilder: (_, index) {
+//               DateTime startTime = this.widget.startDate.add(Duration(days: index));
+//               DateTime endTime = startTime.add(Duration(days: 1));
+//               return EventInDaysDisplay(begin: startTime, end: endTime);
+//             },
+//             addAutomaticKeepAlives: false));
+//   }
+// }

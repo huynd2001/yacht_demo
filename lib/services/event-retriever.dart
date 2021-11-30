@@ -24,12 +24,18 @@ class EventItem {
         'description': description,
         'id': id.toString()
       };
+
+  @override
+  bool operator ==(other) {
+    return (other is EventItem) && (other.id == id);
+  }
+
+  @override
+  int get hashCode => super.hashCode;
 }
 
 class EventRetriever {
   static const eventRetriever = MethodChannel('calendar/events');
-
-  static final List<EventItem> _events = List.empty(growable: true);
 
   static DateTime today() => new DateTime(
       DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
@@ -38,22 +44,15 @@ class EventRetriever {
     // List<String> normalEvents = await eventRetriever.invokeMethod('getEvents');
   }
 
-  // static void addEvent(EventItem event) {
-  //   _events.add(event);
-  // }
-
-  // static void removeEvent(EventItem event) {
-  //   EventItem reEvent = _events.firstWhere((EventItem e) => (event.id == e.id));
-  //   _events.remove(reEvent);
-  // }
-
   static Future<List<EventItem>> retrieveEventFromStartEnd(
       DateTime start, DateTime end) async {
-    List<Map<String, String>> results = await eventRetriever.invokeMethod(
+    List<dynamic> results = await eventRetriever.invokeMethod(
         'getEvents', <String, String>{
       'start': start.toIso8601String(),
       'end': end.toIso8601String()
     });
+
+    print('${results.length} retrieved for range ${start} til ${end}');
     List<Map<String, String>> eventsJson =
         results.map((e) => Map<String, String>.from(e)).toList();
     return eventsJson.map((e) => EventItem.fromJson(e)).toList();
