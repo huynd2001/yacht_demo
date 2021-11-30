@@ -11,7 +11,22 @@ data class Task(
     val completed: Boolean = false,
     @PrimaryKey(autoGenerate = true)
     val taskID: Long = 0,
-)
+) {
+    fun toMap() = buildMap {
+        put("name", name)
+        put("completed", completed.toString())
+        put("taskID", taskID.toString())
+    }
+    companion object {
+        @JvmStatic
+        fun fromMap(map: Map<String, String>) =
+                Task(
+                        name = map.getValue("name"),
+                        completed = map.getValue("completed").toBoolean(),
+                        taskID = map.getValue("taskID").toLong(),
+                )
+    }
+}
 
 @Entity(
     tableName = "event_task_table",
@@ -33,4 +48,3 @@ data class Task(
         indices = [Index(value=["eventID"]), Index(value=["taskID"])]
 )
 data class EventAndTask(val eventID: Long, val taskID: Long)
-
