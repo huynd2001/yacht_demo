@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 
-import 'calendar.dart';
-
 class EventDisplay extends StatelessWidget {
   final EventItem event;
 
