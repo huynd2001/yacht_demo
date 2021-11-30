@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 import 'package:intl/intl.dart';
+import 'package:yacht_demo/components/datetime-picker.dart';
 import 'package:yacht_demo/day-display.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
 
@@ -90,20 +91,10 @@ class _CalendarDisplay extends State<DateWidget> {
   static final DateTime MIN_DATE = DateTime(1000, 1, 1);
   static final DateTime MAX_DATE = DateTime(3000, 12, 31);
 
-  String formTaskName = "";
-  DateTime formStartTime = EventRetriever.today();
-  DateTime formEndTime = EventRetriever.today();
-  final _formKey = GlobalKey<FormState>();
-
   void addEvent(
       DateTime startTime, DateTime endTime, String label, String description) {
     setState(() {
-      EventRetriever.createEvent(startTime, endTime, label, description)
-          .then((value) => {
-                this.formEndTime = EventRetriever.today(),
-                this.formStartTime = EventRetriever.today(),
-                this.formTaskName = "",
-              });
+      EventRetriever.createEvent(startTime, endTime, label, description);
     });
   }
 
@@ -128,151 +119,20 @@ class _CalendarDisplay extends State<DateWidget> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return AlertDialog(
-                    content: Stack(
-                      children: <Widget>[
-                        Form(
-                          key: _formKey,
-                          child: Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: TextFormField(
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter some text';
-                                    }
-                                    return null;
-                                  },
-                                  decoration: const InputDecoration(
-                                      border: UnderlineInputBorder(),
-                                      labelText: 'Task'),
-                                  onSaved: (val) {
-                                    this.formTaskName = val!;
-                                    val = "";
-                                  },
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Row(children: <Widget>[
-                                  Container(
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        showDatePicker(
-                                          context: context,
-                                          initialDate: DateTime.now(),
-                                          firstDate: MIN_DATE,
-                                          lastDate: MAX_DATE,
-                                        ).then((value) => {
-                                              setState(() {
-                                                formStartTime =
-                                                    value ?? DateTime.now();
-                                              }),
-                                              print(formStartTime),
-                                            });
-                                      },
-                                      child: Text('Start Date'),
-                                    ),
-                                  ),
-                                  Container(
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        showTimePicker(
-                                                context: context,
-                                                initialTime: TimeOfDay.now())
-                                            .then((value) => {
-                                                  setState(() {
-                                                    TimeOfDay time = value ??
-                                                        TimeOfDay.now();
-                                                    formStartTime =
-                                                        new DateTime(
-                                                            formStartTime.year,
-                                                            formStartTime.month,
-                                                            formStartTime.day,
-                                                            time.hour,
-                                                            time.minute);
-                                                  }),
-                                                  print(formStartTime),
-                                                });
-                                      },
-                                      child: Text('Start Time'),
-                                    ),
-                                  ),
-                                ]),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Row(children: <Widget>[
-                                  Container(
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        showDatePicker(
-                                          context: context,
-                                          initialDate: DateTime.now(),
-                                          firstDate: MIN_DATE,
-                                          lastDate: MAX_DATE,
-                                        ).then((value) => {
-                                              setState(() {
-                                                formEndTime =
-                                                    value ?? DateTime.now();
-                                              }),
-                                              print(formEndTime),
-                                            });
-                                      },
-                                      child: Text('End Date'),
-                                    ),
-                                  ),
-                                  Container(
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        showTimePicker(
-                                                context: context,
-                                                initialTime: TimeOfDay.now())
-                                            .then((value) => {
-                                                  setState(() {
-                                                    TimeOfDay time = value ??
-                                                        TimeOfDay.now();
-                                                    formEndTime = new DateTime(
-                                                        formEndTime.year,
-                                                        formEndTime.month,
-                                                        formEndTime.day,
-                                                        time.hour,
-                                                        time.minute);
-                                                  }),
-                                                  print(formEndTime),
-                                                });
-                                      },
-                                      child: Text('End Time'),
-                                    ),
-                                  ),
-                                ]),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ElevatedButton(
-                                  child: Text("Submit"),
-                                  onPressed: () {
-                                    if (_formKey.currentState!.validate()) {
-                                      _formKey.currentState!.save();
-                                      addEvent(formStartTime, formEndTime, '',
-                                          formTaskName);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text('Event Added!')),
-                                      );
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                  return EventEditor(
+                      callback: (startTime, endTime, label, description) {
+                    print("kek");
+                    if (startTime != null &&
+                        endTime != null &&
+                        startTime.isBefore(endTime)) {
+                      print('lmao');
+                      addEvent(startTime, endTime, label, description);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Event Added!')),
+                      );
+                      Navigator.pop(context);
+                    }
+                  });
                 });
           },
           child: Text('ADD EVENT'))

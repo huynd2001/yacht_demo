@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EventEditor extends StatefulWidget {
-  Function callback = () => {};
+  final Function(
+          DateTime? start, DateTime? end, String label, String description)
+      callback;
 
-  EventEditor({Key? key, required Function callback}) : super(key: key);
+  EventEditor({Key? key, required this.callback}) : super(key: key);
 
   @override
   _EventEditorState createState() => _EventEditorState();
@@ -15,7 +17,8 @@ class _EventEditorState extends State<EventEditor> {
   static final DateTime MIN_DATE = DateTime(1000, 1, 1);
   static final DateTime MAX_DATE = DateTime(3000, 12, 31);
 
-  String formTaskName = "";
+  String formLabel = "";
+  String formDescription = "";
   DateTime? formStartTime;
   DateTime? formEndTime;
   final _formKey = GlobalKey<FormState>();
@@ -39,9 +42,27 @@ class _EventEditorState extends State<EventEditor> {
                       return null;
                     },
                     decoration: const InputDecoration(
-                        border: UnderlineInputBorder(), labelText: 'Task'),
+                        border: UnderlineInputBorder(), labelText: 'Label'),
                     onSaved: (val) {
-                      this.formTaskName = val!;
+                      this.formLabel = val!;
+                      val = "";
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                        labelText: 'Description'),
+                    onSaved: (val) {
+                      this.formDescription = val!;
                       val = "";
                     },
                   ),
@@ -50,8 +71,9 @@ class _EventEditorState extends State<EventEditor> {
                   padding: EdgeInsets.all(8.0),
                   child: Row(children: <Widget>[
                     Container(
-                      child: ElevatedButton(
-                        onPressed: () {
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
                           showDatePicker(
                             context: context,
                             initialDate: DateTime.now(),
@@ -65,14 +87,15 @@ class _EventEditorState extends State<EventEditor> {
                               });
                         },
                         // ignore: unnecessary_null_comparison
-                        child: Text((formStartTime != null)
+                        child: Text((formStartTime == null)
                             ? 'Start Date'
                             : DateFormat("M-d").format(formStartTime!)),
                       ),
                     ),
                     Container(
-                      child: ElevatedButton(
-                        onPressed: () {
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
                           showTimePicker(
                                   context: context,
                                   initialTime: TimeOfDay.now())
@@ -89,9 +112,9 @@ class _EventEditorState extends State<EventEditor> {
                                     print(formStartTime),
                                   });
                         },
-                        child: Text((formEndTime != null)
+                        child: Text((formStartTime == null)
                             ? 'Start Time'
-                            : DateFormat("h:mm a").format(formEndTime!)),
+                            : DateFormat("h:mm a").format(formStartTime!)),
                       ),
                     ),
                   ]),
@@ -100,13 +123,14 @@ class _EventEditorState extends State<EventEditor> {
                   padding: EdgeInsets.all(8.0),
                   child: Row(children: <Widget>[
                     Container(
-                      child: ElevatedButton(
-                        onPressed: () {
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
                           showDatePicker(
                             context: context,
                             initialDate: DateTime.now(),
-                            firstDate: MAX_DATE,
-                            lastDate: MIN_DATE,
+                            firstDate: MIN_DATE,
+                            lastDate: MAX_DATE,
                           ).then((value) => {
                                 setState(() {
                                   formEndTime = value ?? DateTime.now();
@@ -114,14 +138,15 @@ class _EventEditorState extends State<EventEditor> {
                                 print(formEndTime),
                               });
                         },
-                        child: Text((formStartTime != null)
+                        child: Text((formEndTime == null)
                             ? 'End Date'
-                            : DateFormat("M-d").format(formStartTime!)),
+                            : DateFormat("M-d").format(formEndTime!)),
                       ),
                     ),
                     Container(
-                      child: ElevatedButton(
-                        onPressed: () {
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
                           showTimePicker(
                                   context: context,
                                   initialTime: TimeOfDay.now())
@@ -138,7 +163,7 @@ class _EventEditorState extends State<EventEditor> {
                                     print(formEndTime),
                                   });
                         },
-                        child: Text((formEndTime != null)
+                        child: Text((formEndTime == null)
                             ? 'End Time'
                             : DateFormat("h:mm a").format(formEndTime!)),
                       ),
@@ -152,10 +177,13 @@ class _EventEditorState extends State<EventEditor> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        print(this.formTaskName);
-                        print(this.formStartTime);
-                        print(this.formEndTime);
-                        this.widget.callback();
+                        print(
+                            '${this.formStartTime}  ${this.formEndTime}  ${this.formLabel}     ${this.formDescription}');
+                        this.widget.callback(
+                            this.formStartTime,
+                            this.formEndTime,
+                            this.formLabel,
+                            this.formDescription);
                       }
                     },
                   ),
