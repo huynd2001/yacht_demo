@@ -2,18 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class EventEditor extends StatefulWidget {
+class EventCreator extends StatefulWidget {
   final Function(
           DateTime? start, DateTime? end, String label, String description)
       callback;
 
-  EventEditor({Key? key, required this.callback}) : super(key: key);
+  EventCreator({Key? key, required this.callback}) : super(key: key);
 
   @override
   _EventEditorState createState() => _EventEditorState();
 }
 
-class _EventEditorState extends State<EventEditor> {
+class _EventEditorState extends State<EventCreator> {
   static final DateTime MIN_DATE = DateTime(1000, 1, 1);
   static final DateTime MAX_DATE = DateTime(3000, 12, 31);
 

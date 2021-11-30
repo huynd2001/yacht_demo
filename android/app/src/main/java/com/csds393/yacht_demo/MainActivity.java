@@ -242,8 +242,8 @@ public class MainActivity extends FlutterActivity {
 
                 Map<String, String> newMap = new HashMap<>();
                 newMap.put("startDate", startDate.toLocalDate().toString());
-                newMap.put("endDate", endDate.toLocalTime().toString());
-                newMap.put("startTime", startDate.toLocalDate().toString());
+                newMap.put("endDate", endDate.toLocalDate().toString());
+                newMap.put("startTime", startDate.toLocalTime().toString());
                 newMap.put("endTime", endDate.toLocalTime().toString());
                 newMap.put("label", label);
                 newMap.put("description", description);
@@ -295,8 +295,8 @@ public class MainActivity extends FlutterActivity {
 
                 Map<String, String> newMap = new HashMap<>();
                 newMap.put("startDate", startDate.toLocalDate().toString());
-                newMap.put("endDate", endDate.toLocalTime().toString());
-                newMap.put("startTime", startDate.toLocalDate().toString());
+                newMap.put("endDate", endDate.toLocalDate().toString());
+                newMap.put("startTime", startDate.toLocalTime().toString());
                 newMap.put("endTime", endDate.toLocalTime().toString());
                 newMap.put("label", label);
                 newMap.put("description", description);

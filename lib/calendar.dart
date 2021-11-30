@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 import 'package:intl/intl.dart';
-import 'package:yacht_demo/components/datetime-picker.dart';
+import 'package:yacht_demo/components/event-creator.dart';
 import 'package:yacht_demo/day-display.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
 
@@ -119,13 +119,11 @@ class _CalendarDisplay extends State<DateWidget> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return EventEditor(
+                  return EventCreator(
                       callback: (startTime, endTime, label, description) {
-                    print("kek");
                     if (startTime != null &&
                         endTime != null &&
                         startTime.isBefore(endTime)) {
-                      print('lmao');
                       addEvent(startTime, endTime, label, description);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Event Added!')),

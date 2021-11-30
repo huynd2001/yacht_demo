@@ -52,24 +52,23 @@ class EventRetriever {
       'end': end.toIso8601String()
     });
 
-    print('${results.length} retrieved for range ${start} til ${end}');
+    // print('${results.length} retrieved for range ${start} til ${end}');
     List<Map<String, String>> eventsJson =
         results.map((e) => Map<String, String>.from(e)).toList();
     return eventsJson.map((e) => EventItem.fromJson(e)).toList();
   }
 
-  static Future<bool> createEvent(DateTime startTime, DateTime endTime,
+  static Future<void> createEvent(DateTime startTime, DateTime endTime,
       String label, String description) async {
-    int id = await eventRetriever.invokeMethod('createEvent', <String, String>{
+    await eventRetriever.invokeMethod('createEvent', <String, String>{
       'start': startTime.toIso8601String(),
       'end': endTime.toIso8601String(),
       'label': label,
       'description': description
     });
-    return id != -1;
   }
 
-  static Future<bool> removeEvent(int eventID, DateTime startTime,
+  static Future<void> removeEvent(int eventID, DateTime startTime,
       DateTime endTime, String label, String description) async {
     return await eventRetriever.invokeMethod('removeEvent', <String, String>{
       'id': eventID.toString(),
@@ -77,10 +76,10 @@ class EventRetriever {
       'end': endTime.toIso8601String(),
       'label': label,
       'description': description
-    }) as bool;
+    });
   }
 
-  static Future<bool> modifyEvent(int eventID, DateTime startTime,
+  static Future<void> modifyEvent(int eventID, DateTime startTime,
       DateTime endTime, String label, String description) async {
     return await eventRetriever.invokeMethod('modifyEvent', <String, String>{
       'id': eventID.toString(),

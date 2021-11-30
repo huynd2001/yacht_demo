@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yacht_demo/components/event-editor.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
 import 'package:infinite_listview/infinite_listview.dart';
 
@@ -15,23 +16,22 @@ class EventDisplay extends StatelessWidget {
     return new Stack(
       children: <Widget>[
         new Padding(
-          padding: const EdgeInsets.only(right: 50.0),
-          child: new Card(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                ListTile(
-                  leading: Icon(Icons.lightbulb),
-                  title: Text(event.description),
-                  subtitle: Text(
-                      DateFormat('h:mm a', 'en_US').format(event.startTime) +
-                          ' - ' +
-                          DateFormat('h:mm a', 'en_US').format(event.endTime)),
-                )
-              ],
-            ),
-          ),
-        ),
+            padding: const EdgeInsets.only(right: 50.0),
+            child: Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ListTile(
+                    leading: Icon(Icons.lightbulb),
+                    title: Text(event.description),
+                    subtitle: Text(DateFormat('h:mm a', 'en_US')
+                            .format(event.startTime) +
+                        ' - ' +
+                        DateFormat('h:mm a', 'en_US').format(event.endTime)),
+                  )
+                ],
+              ),
+            ))
       ],
     );
   }
@@ -72,7 +72,43 @@ class _EventInDaysDisplayState extends State<EventInDaysDisplay> {
           ),
           child: ListView(
             addAutomaticKeepAlives: false,
-            children: events.map((e) => EventDisplay(event: e)).toList(),
+            children: events
+                .map((e) => GestureDetector(
+                    child: EventDisplay(event: e),
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return EventEditor(
+                                event: e,
+                                saveCallback:
+                                    (start, end, label, description, id) {
+                                  if (start != null &&
+                                      end != null &&
+                                      start.isBefore(end)) {
+                                    EventRetriever.modifyEvent(
+                                        id, start, end, label, description);
+                                    this.setState(() {});
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Event Modified!')),
+                                    );
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                removeCallback: (e) {
+                                  EventRetriever.removeEvent(e.id, e.startTime,
+                                      e.endTime, e.label, e.description);
+                                  this.setState(() {});
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Event Removed!')),
+                                  );
+                                  Navigator.pop(context);
+                                });
+                          });
+                    }))
+                .toList(),
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
           ))
@@ -90,7 +126,7 @@ class DayDisplay extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.blue, title: const Text('Date View')),
-        body: ListView.builder(
+        body: InfiniteListView.builder(
             itemBuilder: (_, index) {
               DateTime startTime = this.startDate.add(Duration(days: index));
               DateTime endTime = startTime.add(Duration(days: 1));
