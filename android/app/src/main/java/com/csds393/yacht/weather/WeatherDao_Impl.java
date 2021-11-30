@@ -444,9 +444,10 @@ public final class WeatherDao_Impl implements WeatherDao {
     if (_value == null) {
       return null;
     } switch (_value) {
+      case SNOW: return "SNOW";
       case SUNNY: return "SUNNY";
       case CLOUDY: return "CLOUDY";
-      case RAINY: return "RAINY";
+      case RAIN: return "RAIN";
       case CLEAR: return "CLEAR";
       default: throw new IllegalArgumentException("Can't convert enum to string, unknown enum value: " + _value);
     }
@@ -456,9 +457,10 @@ public final class WeatherDao_Impl implements WeatherDao {
     if (_value == null) {
       return null;
     } switch (_value) {
+      case "SNOW": return Sky.SNOW;
       case "SUNNY": return Sky.SUNNY;
       case "CLOUDY": return Sky.CLOUDY;
-      case "RAINY": return Sky.RAINY;
+      case "RAIN": return Sky.RAIN;
       case "CLEAR": return Sky.CLEAR;
       default: throw new IllegalArgumentException("Can't convert value to enum, unknown value: " + _value);
     }
