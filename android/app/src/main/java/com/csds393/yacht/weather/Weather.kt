@@ -7,6 +7,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import java.net.*
 import java.time.*
+import java.util.concurrent.Executors
 import java.util.regex.Pattern
 import kotlin.math.round
 
@@ -14,6 +15,8 @@ import kotlin.math.round
 object Weather {
 
     private val json = Json { ignoreUnknownKeys = true }
+
+    private val weatherFetcher = Executors.newSingleThreadExecutor()
 
     /*
      One degree (of latitude) is about 85 km.
@@ -38,12 +41,12 @@ object Weather {
 
         val weatherDao = DB.getInstance().weatherDao
         // attempt web query, update db
-        try {
+        try { weatherFetcher.submit {
             val rf = retrieveForecastsForCoordinates(lat, lon)
             rf?.let {
                 weatherDao.insertForecasts(rf)
             }
-        } catch (e: Exception) {
+        } } catch (e: Exception) {
         }
 
         // return db results
