@@ -5,18 +5,10 @@ class EventItem {
   final DateTime endTime;
   final String description;
   final String label;
-  final int? id;
-  static int eventIdTracking = 0;
+  final int id;
 
   const EventItem._(
       this.startTime, this.endTime, this.label, this.description, this.id);
-
-  static EventItem of(
-      DateTime startTime, DateTime endTime, String label, String description) {
-    eventIdTracking++;
-    return new EventItem._(
-        startTime, endTime, label, description, eventIdTracking);
-  }
 
   EventItem.fromJson(Map<String, String> json)
       : startTime = DateTime.parse(json['startTime'].toString()),
@@ -46,18 +38,14 @@ class EventRetriever {
     // List<String> normalEvents = await eventRetriever.invokeMethod('getEvents');
   }
 
-  static List<EventItem> retrieveEvents(bool test(EventItem e)) {
-    return List.from(_events.where(test));
-  }
+  // static void addEvent(EventItem event) {
+  //   _events.add(event);
+  // }
 
-  static void addEvent(EventItem event) {
-    _events.add(event);
-  }
-
-  static void removeEvent(EventItem event) {
-    EventItem reEvent = _events.firstWhere((EventItem e) => (event.id == e.id));
-    _events.remove(reEvent);
-  }
+  // static void removeEvent(EventItem event) {
+  //   EventItem reEvent = _events.firstWhere((EventItem e) => (event.id == e.id));
+  //   _events.remove(reEvent);
+  // }
 
   static Future<List<EventItem>> retrieveEventFromStartEnd(
       DateTime start, DateTime end) async {
@@ -69,5 +57,38 @@ class EventRetriever {
     List<Map<String, String>> eventsJson =
         results.map((e) => Map<String, String>.from(e)).toList();
     return eventsJson.map((e) => EventItem.fromJson(e)).toList();
+  }
+
+  static Future<bool> createEvent(DateTime startTime, DateTime endTime,
+      String label, String description) async {
+    int id = await eventRetriever.invokeMethod('createEvent', <String, String>{
+      'start': startTime.toIso8601String(),
+      'end': endTime.toIso8601String(),
+      'label': label,
+      'description': description
+    });
+    return id != -1;
+  }
+
+  static Future<bool> removeEvent(int eventID, DateTime startTime,
+      DateTime endTime, String label, String description) async {
+    return await eventRetriever.invokeMethod('removeEvent', <String, String>{
+      'id': eventID.toString(),
+      'start': startTime.toIso8601String(),
+      'end': endTime.toIso8601String(),
+      'label': label,
+      'description': description
+    }) as bool;
+  }
+
+  static Future<bool> modifyEvent(int eventID, DateTime startTime,
+      DateTime endTime, String label, String description) async {
+    return await eventRetriever.invokeMethod('modifyEvent', <String, String>{
+      'id': eventID.toString(),
+      'start': startTime.toIso8601String(),
+      'end': endTime.toIso8601String(),
+      'label': label,
+      'description': description
+    });
   }
 }

@@ -36,11 +36,15 @@ class CalendarItemDisplay extends StatefulWidget {
 class _CalendarItemDisplayState extends State<CalendarItemDisplay> {
   List<EventItem> events = List.empty(growable: true);
 
-  @override
-  Widget build(BuildContext context) {
+  gettingEvents() {
     EventRetriever.retrieveEventFromStartEnd(
             this.widget.startTime, this.widget.endTime)
-        .then((value) => {events.addAll(value)});
+        .then((value) => {events = value});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    gettingEvents();
 
     return GestureDetector(
       onTap: () {
@@ -83,9 +87,10 @@ class _CalendarDisplay extends State<DateWidget> {
   DateTime formEndTime = DateTime.now();
   final _formKey = GlobalKey<FormState>();
 
-  void addEvent(EventItem e) {
+  void addEvent(
+      DateTime startTime, DateTime endTime, String label, String description) {
     setState(() {
-      EventRetriever.addEvent(e);
+      EventRetriever.createEvent(startTime, endTime, label, description);
     });
   }
 
@@ -240,8 +245,8 @@ class _CalendarDisplay extends State<DateWidget> {
                                       print(this.formTaskName);
                                       print(this.formStartTime);
                                       print(this.formEndTime);
-                                      addEvent(EventItem.of(formStartTime,
-                                          formEndTime, '', formTaskName));
+                                      addEvent(formStartTime, formEndTime, '',
+                                          formTaskName);
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
@@ -261,54 +266,5 @@ class _CalendarDisplay extends State<DateWidget> {
           },
           child: Text('ADD EVENT'))
     ]);
-  }
-}
-
-class MyCustomForm extends StatefulWidget {
-  const MyCustomForm({Key? key}) : super(key: key);
-
-  @override
-  MyCustomFormState createState() => MyCustomFormState();
-}
-
-class MyCustomFormState extends State<MyCustomForm> {
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey created above.
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextFormField(
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter some text';
-              }
-              return null;
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Validate returns true if the form is valid, or false otherwise.
-                if (_formKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing Data')),
-                  );
-                }
-              },
-              child: const Text('Submit'),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
