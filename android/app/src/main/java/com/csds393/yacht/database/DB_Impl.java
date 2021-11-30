@@ -48,8 +48,9 @@ public final class DB_Impl extends DB {
         _db.execSQL("CREATE TABLE IF NOT EXISTS `tasks` (`name` TEXT NOT NULL, `completed` INTEGER NOT NULL, `taskID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
         _db.execSQL("CREATE TABLE IF NOT EXISTS `event_task_table` (`eventID` INTEGER NOT NULL, `taskID` INTEGER NOT NULL, PRIMARY KEY(`eventID`, `taskID`), FOREIGN KEY(`eventID`) REFERENCES `normal_events`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`taskID`) REFERENCES `tasks`(`taskID`) ON UPDATE NO ACTION ON DELETE CASCADE )");
         _db.execSQL("CREATE INDEX IF NOT EXISTS `index_event_task_table_eventID` ON `event_task_table` (`eventID`)");
+        _db.execSQL("CREATE INDEX IF NOT EXISTS `index_event_task_table_taskID` ON `event_task_table` (`taskID`)");
         _db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        _db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '752beb03eb779054624424a7d6e98a5a')");
+        _db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '16fb3a377f1afdc2fcd8d19bf8fb4008')");
       }
 
       @Override
@@ -193,8 +194,9 @@ public final class DB_Impl extends DB {
         final HashSet<TableInfo.ForeignKey> _foreignKeysEventTaskTable = new HashSet<TableInfo.ForeignKey>(2);
         _foreignKeysEventTaskTable.add(new TableInfo.ForeignKey("normal_events", "CASCADE", "NO ACTION",Arrays.asList("eventID"), Arrays.asList("id")));
         _foreignKeysEventTaskTable.add(new TableInfo.ForeignKey("tasks", "CASCADE", "NO ACTION",Arrays.asList("taskID"), Arrays.asList("taskID")));
-        final HashSet<TableInfo.Index> _indicesEventTaskTable = new HashSet<TableInfo.Index>(1);
+        final HashSet<TableInfo.Index> _indicesEventTaskTable = new HashSet<TableInfo.Index>(2);
         _indicesEventTaskTable.add(new TableInfo.Index("index_event_task_table_eventID", false, Arrays.asList("eventID")));
+        _indicesEventTaskTable.add(new TableInfo.Index("index_event_task_table_taskID", false, Arrays.asList("taskID")));
         final TableInfo _infoEventTaskTable = new TableInfo("event_task_table", _columnsEventTaskTable, _foreignKeysEventTaskTable, _indicesEventTaskTable);
         final TableInfo _existingEventTaskTable = TableInfo.read(_db, "event_task_table");
         if (! _infoEventTaskTable.equals(_existingEventTaskTable)) {
@@ -204,7 +206,7 @@ public final class DB_Impl extends DB {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "752beb03eb779054624424a7d6e98a5a", "2691653f947dae34130634bc693e4043");
+    }, "16fb3a377f1afdc2fcd8d19bf8fb4008", "2dfd4af035c1d4c142cb7ec593ddb468");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(configuration.context)
             .name(configuration.name)
             .callback(_openCallback)
