@@ -35,6 +35,9 @@ interface CalendarDao {
 
     /* Read */
 
+    @Query("SELECT * FROM normal_events WHERE startDate == :date")
+    fun getEventsStartingOnDay(date: LocalDate): List<CalendarEvent>
+
     @Query("SELECT * FROM normal_events where :earliest <= startDate <= :latest")
     fun getEventsStartingInDateWindow(earliest: LocalDate, latest: LocalDate): List<CalendarEvent>
 
@@ -53,7 +56,6 @@ interface CalendarDao {
                     put("taskID", it.taskID.toString())
                 }
             }
-
 
     @Query("SELECT * FROM recurring_events")
     fun _getRecurringEvents(): List<RecurringCalendarEvent>
