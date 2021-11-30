@@ -57,11 +57,7 @@ class EventRetriever {
     // print('${results.length} retrieved for range ${start} til ${end}');
     List<Map<String, String>> eventsJson =
         results.map((e) => Map<String, String>.from(e)).toList();
-    return eventsJson
-        .map((e) => EventItem.fromJson(e))
-        .where((e) => e.startTime.isAfter(start))
-        .where((e) => e.startTime.isBefore(end))
-        .toList();
+    return eventsJson.map((e) => EventItem.fromJson(e)).toList();
   }
 
   static Future<void> createEvent(DateTime startTime, DateTime endTime,
