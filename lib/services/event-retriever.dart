@@ -1,35 +1,94 @@
 import 'package:flutter/services.dart';
 
-import '../calendar.dart';
+class EventItem {
+  final DateTime startTime;
+  final DateTime endTime;
+  final String description;
+  final String label;
+  final int id;
+
+  const EventItem._(
+      this.startTime, this.endTime, this.label, this.description, this.id);
+
+  EventItem.fromJson(Map<String, String> json)
+      : startTime = DateTime.parse(json['startTime'].toString()),
+        endTime = DateTime.parse(json['endTime'].toString()),
+        description = json['description'].toString(),
+        label = json['label'].toString(),
+        id = int.parse(json['id'] ?? "-1");
+
+  Map<String, String> toJson() => {
+        'startTime': startTime.toIso8601String(),
+        'endTime': endTime.toIso8601String(),
+        'label': label,
+        'description': description,
+        'id': id.toString()
+      };
+
+  @override
+  bool operator ==(other) {
+    return (other is EventItem) && (other.id == id);
+  }
+
+  @override
+  int get hashCode => super.hashCode;
+}
 
 class EventRetriever {
   static const eventRetriever = MethodChannel('calendar/events');
 
-  static final List<EventItem> _events = List.empty(growable: true);
-
   static DateTime today() => new DateTime(
       DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
 
-  static void init() async {
-    List<String> normalEvents = await eventRetriever.invokeMethod('getEvents');
+  static void init() {
+    // List<String> normalEvents = await eventRetriever.invokeMethod('getEvents');
   }
 
-  static List<EventItem> retrieveEvents(bool test(EventItem e)) {
-    return List.from(_events.where(test));
+  static Future<List<EventItem>> retrieveEventFromStartEnd(
+      DateTime start, DateTime end) async {
+    // print(
+    //     'Retrieving events from ${start.toIso8601String()} til ${end.toIso8601String()}');
+    List<dynamic> results = await eventRetriever.invokeMethod(
+        'getEvents', <String, String>{
+      'start': start.toIso8601String(),
+      'end': end.toIso8601String()
+    });
+
+    // print('${results.length} retrieved for range ${start} til ${end}');
+    List<Map<String, String>> eventsJson =
+        results.map((e) => Map<String, String>.from(e)).toList();
+    return eventsJson.map((e) => EventItem.fromJson(e)).toList();
   }
 
-  static void addEvent(EventItem event) {
-    _events.add(event);
+  static Future<void> createEvent(DateTime startTime, DateTime endTime,
+      String label, String description) async {
+    await eventRetriever.invokeMethod('createEvent', <String, String>{
+      'start': startTime.toIso8601String(),
+      'end': endTime.toIso8601String(),
+      'label': label,
+      'description': description
+    });
   }
 
-  static void removeEvent(EventItem event) {
-    EventItem reEvent = _events.firstWhere((EventItem e) => (event.id == e.id));
-    _events.remove(reEvent);
+  static Future<void> removeEvent(int eventID, DateTime startTime,
+      DateTime endTime, String label, String description) async {
+    return await eventRetriever.invokeMethod('removeEvent', <String, String>{
+      'id': eventID.toString(),
+      'start': startTime.toIso8601String(),
+      'end': endTime.toIso8601String(),
+      'label': label,
+      'description': description
+    });
   }
 
-  static List<EventItem> retrieveEventFromStartEnd(
-      DateTime start, DateTime end) {
-    return retrieveEvents(
-        (e) => start.isBefore(e.startTime) && end.isAfter(e.startTime));
+  static Future<void> modifyEvent(int eventID, DateTime startTime,
+      DateTime endTime, String label, String description) async {
+    return await eventRetriever.invokeMethod('modifyEvent', <String, String>{
+      'id': eventID.toString(),
+      'start': startTime.toIso8601String(),
+      'end': endTime.toIso8601String(),
+      'label': label,
+      'description': description
+    });
   }
 }

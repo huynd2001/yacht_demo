@@ -5,10 +5,8 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-import 'package:yacht_demo/calendar.dart';
 import 'package:yacht_demo/day-display.dart';
 
 import 'package:yacht_demo/main.dart';
@@ -21,11 +19,6 @@ void main() {
     final cardFinder =
         find.text(DateFormat('M-d').format(EventRetriever.today()));
     expect(cardFinder, findsWidgets);
-
-    EventRetriever.addEvent(EventItem.of(
-        EventRetriever.today().add(Duration(hours: 4)),
-        EventRetriever.today().add(Duration(hours: 5)),
-        "testEvent"));
 
     await tester.pumpWidget(EventInDaysDisplay(
         begin: EventRetriever.today(),
