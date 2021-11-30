@@ -38,12 +38,11 @@ class _EventEditorState extends State<EventEditor> {
     formLabel = this.widget.event.label;
     formDescription = this.widget.event.description;
     return AlertDialog(
-      insetPadding: EdgeInsets.all(10),
       content: Stack(
         children: <Widget>[
           Form(
             key: _formKey,
-            child: ListView(
+            child: Column(
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.all(8.0),

@@ -79,7 +79,7 @@ class _CalendarItemDisplayState extends State<CalendarItemDisplay> {
                         DateFormat('EEE').format(this.widget.startTime),
                       ))
                 ] +
-                events.map((e) => Text(e.description)).take(4).toList(),
+                events.map((e) => Text(e.label)).take(4).toList(),
           ),
         ),
       ),

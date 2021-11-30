@@ -45,7 +45,6 @@ class _EventEditorState extends State<EventCreator> {
                         border: UnderlineInputBorder(), labelText: 'Label'),
                     onSaved: (val) {
                       this.formLabel = val!;
-                      val = "";
                     },
                   ),
                 ),
@@ -63,7 +62,6 @@ class _EventEditorState extends State<EventCreator> {
                         labelText: 'Description'),
                     onSaved: (val) {
                       this.formDescription = val!;
-                      val = "";
                     },
                   ),
                 ),

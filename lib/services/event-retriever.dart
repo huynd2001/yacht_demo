@@ -46,6 +46,8 @@ class EventRetriever {
 
   static Future<List<EventItem>> retrieveEventFromStartEnd(
       DateTime start, DateTime end) async {
+    // print(
+    //     'Retrieving events from ${start.toIso8601String()} til ${end.toIso8601String()}');
     List<dynamic> results = await eventRetriever.invokeMethod(
         'getEvents', <String, String>{
       'start': start.toIso8601String(),
@@ -55,7 +57,11 @@ class EventRetriever {
     // print('${results.length} retrieved for range ${start} til ${end}');
     List<Map<String, String>> eventsJson =
         results.map((e) => Map<String, String>.from(e)).toList();
-    return eventsJson.map((e) => EventItem.fromJson(e)).toList();
+    return eventsJson
+        .map((e) => EventItem.fromJson(e))
+        .where((e) => e.startTime.isAfter(start))
+        .where((e) => e.startTime.isBefore(end))
+        .toList();
   }
 
   static Future<void> createEvent(DateTime startTime, DateTime endTime,
