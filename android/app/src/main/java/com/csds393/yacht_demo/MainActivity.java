@@ -80,17 +80,20 @@ public class MainActivity extends FlutterActivity {
 
             String weatherString;
             switch(weatherDate.getSky()) {
-                case CLEAR:
-                    weatherString = "partlycloudyday";
+                case SNOW:
+                    weatherString = "snow";
                     break;
-                case RAINY:
+                case CLEAR:
+                    weatherString = "clearday";
+                    break;
+                case RAIN:
                     weatherString = "rainyday";
                     break;
                 case SUNNY:
                     weatherString = "clearday";
                     break;
                 case CLOUDY:
-                    weatherString = "foggyday";
+                    weatherString = "partlycloudyday";
                     break;
                 default:
                     weatherString = "notloaded";

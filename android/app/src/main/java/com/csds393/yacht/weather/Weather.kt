@@ -69,26 +69,27 @@ object Weather {
             val jsonHalfDayWeatherList = weatherElementList
                 .map<JsonElement, JsonHalfDayWeather> { json.decodeFromJsonElement(it) }
 
-            val dayWeatherList = mutableListOf<DayWeather>()
-            val iter = jsonHalfDayWeatherList.listIterator()
+            return buildList {
+                val iter = ( // if first is not dayTime, need to drop first and last to re-align half-days
+                        if (! jsonHalfDayWeatherList.first().isDaytime) jsonHalfDayWeatherList.drop(1).dropLast(1)
+                        else jsonHalfDayWeatherList
+                        ).listIterator()
 
-            while (iter.hasNext()) {
-                // get pairs by date
-                val morningWeather = iter.next()
-                val eveningWeather = iter.next()
-                // merge
-                dayWeatherList.add(
-                    DayWeather(
-                        morningWeather.zonedDateTime.toLocalDate(),
-                        latitude,
-                        longitude,
-                        dateTimeUpdated,
-                        morningWeather.toHalfDayWeather(),
-                        eveningWeather.toHalfDayWeather(),
-                    )
-                )
+                while (iter.hasNext()) {
+                    // get pairs by date
+                    val morningWeather = iter.next()
+                    val eveningWeather = iter.next()
+                    // merge
+                    add(DayWeather(
+                            morningWeather.zonedDateTime.toLocalDate(),
+                            latitude,
+                            longitude,
+                            dateTimeUpdated,
+                            morningWeather.toHalfDayWeather(),
+                            eveningWeather.toHalfDayWeather(),
+                    ))
+                }
             }
-            return dayWeatherList
         }
 
     }
@@ -145,14 +146,13 @@ private data class JsonHalfDayWeather(
     }
     val zonedDateTime: ZonedDateTime by lazy { ZonedDateTime.parse(zonedDateTimeString) }
 
-    // TODO: 10/25/2021  more sophisticated sky field and parsing
     private val sky: Sky by lazy {
-        when {
-            shortForecast.contains("Sunny") -> Sky.SUNNY
-            shortForecast.contains("Cloudy") -> Sky.CLOUDY
-            shortForecast.contains("Rain") -> Sky.RAINY
-            else -> Sky.CLEAR
-        }
+        shortForecast
+            .filter { it.isWhitespace() or it.isLetter() }
+            .uppercase()
+            .split(" ")
+            .find { it in skyNames }
+            ?.let { Sky.valueOf(it) } ?: Sky.CLEAR
     }
 
     fun toHalfDayWeather() =
@@ -192,7 +192,7 @@ data class HalfDayWeather(
     val detailedForecast: String,
 )
 
-// TODO: 10/24/2021  refactor, perhaps compose Forecast from Likelihood+Condition + optional then Forecast
 enum class Sky {
-    SUNNY, CLOUDY, RAINY, CLEAR
+    SNOW, SUNNY, CLOUDY, RAIN, CLEAR
 }
+val skyNames = Sky.values().map { it.name }
