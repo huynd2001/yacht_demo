@@ -48,12 +48,13 @@ data class RecurringCalendarEvent(
     }
 
     companion object {
+        @JvmStatic
         fun fromMap(map: Map<String, String>) =
                 RecurringCalendarEvent(
                         eventBase = CalendarEvent.fromMap(map),
                         activeWindow = LocalDate.parse(map.getValue("windowStart"))..LocalDate.parse(map.getValue("windowEnd")),
-                        datePattern = DatePattern.intToDatePattern(java.lang.Long.parseLong(map.getValue("datePatternSerialized"))),
-                        rec_id = map["rec_id"]?.let { java.lang.Long.parseLong(it) }
+                        datePattern = DatePattern.intToDatePattern(map.getValue("datePatternSerialized").toLong()),
+                        rec_id = map["rec_id"]?.toLongOrNull()
                 )
     }
 

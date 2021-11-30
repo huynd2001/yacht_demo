@@ -63,6 +63,7 @@ data class CalendarEvent internal constructor(
 
     companion object {
         /** Converts a String:String map into a CalendarEvent */
+        @JvmStatic
         fun fromMap(map: Map<String, String>) = CalendarEvent(
                 LocalDate.parse(map.getValue("startDate")),
                 map["startTime"]?.let { LocalTime.parse(it) },
@@ -72,7 +73,7 @@ data class CalendarEvent internal constructor(
                         map.getValue("label"),
                         map.getValue("description")
                 ),
-                map["id"]?.let { java.lang.Long.parseLong(it) }
+                map["id"]?.toLongOrNull()
         )
     }
 
