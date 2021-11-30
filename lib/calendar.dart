@@ -50,7 +50,6 @@ class DateWidget extends StatefulWidget {
 }
 
 class CalendarDisplay extends State<DateWidget> {
-
   static final DateTime MIN_DATE = DateTime(1000, 1, 1);
   static final DateTime MAX_DATE = DateTime(3000, 12, 31);
 
@@ -168,20 +167,22 @@ class CalendarDisplay extends State<DateWidget> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         showTimePicker(
-                                            context: context,
-                                            initialTime: TimeOfDay.now()
-                                        ).then((value) => {
-                                          setState(() {
-                                            TimeOfDay time = value ?? TimeOfDay.now();
-                                            formStartTime = new DateTime(
-                                                formStartTime.year,
-                                                formStartTime.month,
-                                                formStartTime.day,
-                                                time.hour,
-                                                time.minute);
-                                          }),
-                                          print(formStartTime),
-                                        });
+                                                context: context,
+                                                initialTime: TimeOfDay.now())
+                                            .then((value) => {
+                                                  setState(() {
+                                                    TimeOfDay time = value ??
+                                                        TimeOfDay.now();
+                                                    formStartTime =
+                                                        new DateTime(
+                                                            formStartTime.year,
+                                                            formStartTime.month,
+                                                            formStartTime.day,
+                                                            time.hour,
+                                                            time.minute);
+                                                  }),
+                                                  print(formStartTime),
+                                                });
                                       },
                                       child: Text('Start Time'),
                                     ),
@@ -214,20 +215,21 @@ class CalendarDisplay extends State<DateWidget> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         showTimePicker(
-                                            context: context,
-                                            initialTime: TimeOfDay.now()
-                                        ).then((value) => {
-                                          setState(() {
-                                            TimeOfDay time = value ?? TimeOfDay.now();
-                                            formEndTime = new DateTime(
-                                                formEndTime.year,
-                                                formEndTime.month,
-                                                formEndTime.day,
-                                                time.hour,
-                                                time.minute);
-                                          }),
-                                          print(formEndTime),
-                                        });
+                                                context: context,
+                                                initialTime: TimeOfDay.now())
+                                            .then((value) => {
+                                                  setState(() {
+                                                    TimeOfDay time = value ??
+                                                        TimeOfDay.now();
+                                                    formEndTime = new DateTime(
+                                                        formEndTime.year,
+                                                        formEndTime.month,
+                                                        formEndTime.day,
+                                                        time.hour,
+                                                        time.minute);
+                                                  }),
+                                                  print(formEndTime),
+                                                });
                                       },
                                       child: Text('End Time'),
                                     ),
@@ -265,54 +267,5 @@ class CalendarDisplay extends State<DateWidget> {
           },
           child: Text('ADD EVENT'))
     ]);
-  }
-}
-
-class MyCustomForm extends StatefulWidget {
-  const MyCustomForm({Key? key}) : super(key: key);
-
-  @override
-  MyCustomFormState createState() => MyCustomFormState();
-}
-
-class MyCustomFormState extends State<MyCustomForm> {
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey created above.
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextFormField(
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter some text';
-              }
-              return null;
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Validate returns true if the form is valid, or false otherwise.
-                if (_formKey.currentState!.validate()) {
-                  // If the form is valid, display a snackbar. In the real world,
-                  // you'd often call a server or save the information in a database.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing Data')),
-                  );
-                }
-              },
-              child: const Text('Submit'),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
