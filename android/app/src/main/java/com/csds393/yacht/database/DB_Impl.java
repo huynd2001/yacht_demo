@@ -37,7 +37,7 @@ public final class DB_Impl extends DB {
 
   @Override
   protected SupportSQLiteOpenHelper createOpenHelper(DatabaseConfiguration configuration) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(configuration, new RoomOpenHelper.Delegate(10) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(configuration, new RoomOpenHelper.Delegate(11) {
       @Override
       public void createAllTables(SupportSQLiteDatabase _db) {
         _db.execSQL("CREATE TABLE IF NOT EXISTS `normal_events` (`startDate` INTEGER NOT NULL, `startTime` INTEGER, `endDate` INTEGER NOT NULL, `endTime` INTEGER, `id` INTEGER PRIMARY KEY AUTOINCREMENT, `label` TEXT NOT NULL, `description` TEXT NOT NULL)");

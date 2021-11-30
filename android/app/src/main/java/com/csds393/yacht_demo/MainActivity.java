@@ -134,7 +134,7 @@ public class MainActivity extends FlutterActivity {
 
                 List<CalendarEvent> list = DB.getInstance()
                         .getCalendarDao()
-                        .getEventsStartingInDateTimeWindow(this.startDate, this.endDate);
+                        .getEventsStartingOnDay(this.startDate.toLocalDate());
 
                 totalList.addAll(list);
 

@@ -17,7 +17,7 @@ import com.csds393.yacht.weather.*
         Task::class,
         EventAndTask::class,
                ],
-    version = 10,
+    version = 11,
     exportSchema = false)
 @TypeConverters(Converters::class, DatePattern::class)
 abstract class DB : RoomDatabase() {
