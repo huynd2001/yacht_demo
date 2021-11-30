@@ -30,7 +30,7 @@ data class Task(
                 onDelete = CASCADE
             ),
         ],
-        indices = [Index(value=["eventID"])]
+        indices = [Index(value=["eventID"]), Index(value=["taskID"])]
 )
 data class EventAndTask(val eventID: Long, val taskID: Long)
 

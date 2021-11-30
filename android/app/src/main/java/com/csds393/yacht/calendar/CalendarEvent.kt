@@ -56,7 +56,7 @@ data class CalendarEvent internal constructor(
         startTime?.let { put("startTime", it.toString()) }
         put("endDate", endDate.toString())
         endTime?.let { put("endTime", it.toString()) }
-        put("id", id.toString())
+        id?.let { put("id", id.toString()) }
         put("label", details.label)
         put("description", details.description)
     }
@@ -70,7 +70,7 @@ data class CalendarEvent internal constructor(
                 map["endTime"]?.let { LocalTime.parse(it) },
                 Details(
                         map.getValue("label"),
-                        map["description"]?:""
+                        map.getValue("description")
                 ),
                 map["id"]?.let { java.lang.Long.parseLong(it) }
         )

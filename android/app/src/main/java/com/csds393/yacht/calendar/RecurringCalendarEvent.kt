@@ -38,6 +38,26 @@ data class RecurringCalendarEvent(
         val latestDate = minOf(window.endInclusive, activeWindow.endInclusive)
         return !soonestDate.isAfter(latestDate)
     }
+
+    fun toMap() = buildMap {
+        putAll(eventBase.toMap())
+        put("windowStart", activeWindow.start.toString())
+        put("windowEnd", activeWindow.endInclusive.toString())
+        put("datePatternSerialized", DatePattern.datePatternToInt(datePattern))
+        rec_id?.let { put("rec_id", rec_id.toString()) }
+    }
+
+    companion object {
+        fun fromMap(map: Map<String, String>) =
+                RecurringCalendarEvent(
+                        eventBase = CalendarEvent.fromMap(map),
+                        activeWindow = LocalDate.parse(map.getValue("windowStart"))..LocalDate.parse(map.getValue("windowEnd")),
+                        datePattern = DatePattern.intToDatePattern(java.lang.Long.parseLong(map.getValue("datePatternSerialized"))),
+                        rec_id = map["rec_id"]?.let { java.lang.Long.parseLong(it) }
+                )
+    }
+
+
     @Entity(
        tableName = "recurrence_exceptions",
        primaryKeys = ["date", "event_id"],
