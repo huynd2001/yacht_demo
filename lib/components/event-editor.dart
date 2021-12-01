@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:yacht_demo/day-display.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
 
 class EventEditor extends StatefulWidget {

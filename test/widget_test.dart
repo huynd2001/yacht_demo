@@ -19,11 +19,6 @@ void main() {
     final cardFinder =
         find.text(DateFormat('M-d').format(EventRetriever.today()));
     expect(cardFinder, findsWidgets);
-
-    await tester.pumpWidget(EventInDaysDisplay(
-        begin: EventRetriever.today(),
-        end: EventRetriever.today().add(Duration(days: 1))));
-
     final item = find.text("testEvent");
 
     expect(item, findsOneWidget);

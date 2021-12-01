@@ -62,6 +62,9 @@ class _CalendarItemDisplayState extends State<CalendarItemDisplay> {
           MaterialPageRoute(
               builder: (_) => DayDisplay(
                     startDate: EventRetriever.today(),
+                    callback: () {
+                      setState(() {});
+                    },
                   )),
         );
       },
@@ -129,6 +132,7 @@ class _CalendarDisplay extends State<DateWidget> {
                         const SnackBar(content: Text('Event Added!')),
                       );
                       Navigator.pop(context);
+                      this.setState(() {});
                     }
                   });
                 });

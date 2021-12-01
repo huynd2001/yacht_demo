@@ -40,8 +40,13 @@ class EventDisplay extends StatelessWidget {
 class EventInDaysDisplay extends StatefulWidget {
   final DateTime begin;
   final DateTime end;
+  final Function() changeCallBack;
 
-  const EventInDaysDisplay({Key? key, required this.begin, required this.end})
+  EventInDaysDisplay(
+      {Key? key,
+      required this.begin,
+      required this.end,
+      required this.changeCallBack})
       : super(key: key);
 
   @override
@@ -94,6 +99,7 @@ class _EventInDaysDisplayState extends State<EventInDaysDisplay> {
                                           content: Text('Event Modified!')),
                                     );
                                     Navigator.pop(context);
+                                    this.widget.changeCallBack();
                                   }
                                 },
                                 removeCallback: (e) {
@@ -105,6 +111,7 @@ class _EventInDaysDisplayState extends State<EventInDaysDisplay> {
                                         content: Text('Event Removed!')),
                                   );
                                   Navigator.pop(context);
+                                  this.widget.changeCallBack();
                                 });
                           });
                     }))
@@ -119,7 +126,10 @@ class _EventInDaysDisplayState extends State<EventInDaysDisplay> {
 class DayDisplay extends StatelessWidget {
   final DateTime startDate;
 
-  const DayDisplay({Key? key, required this.startDate}) : super(key: key);
+  final Function() callback;
+
+  const DayDisplay({Key? key, required this.startDate, required this.callback})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -130,27 +140,9 @@ class DayDisplay extends StatelessWidget {
             itemBuilder: (_, index) {
               DateTime startTime = this.startDate.add(Duration(days: index));
               DateTime endTime = startTime.add(Duration(days: 1));
-              return EventInDaysDisplay(begin: startTime, end: endTime);
+              return EventInDaysDisplay(
+                  begin: startTime, end: endTime, changeCallBack: callback);
             },
             addAutomaticKeepAlives: false));
   }
-
-  // @override
-  // _DayDisplayState createState() => _DayDisplayState();
 }
-
-// class _DayDisplayState extends State<DayDisplay> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(
-//             backgroundColor: Colors.blue, title: const Text('Date View')),
-//         body: ListView.builder(
-//             itemBuilder: (_, index) {
-//               DateTime startTime = this.widget.startDate.add(Duration(days: index));
-//               DateTime endTime = startTime.add(Duration(days: 1));
-//               return EventInDaysDisplay(begin: startTime, end: endTime);
-//             },
-//             addAutomaticKeepAlives: false));
-//   }
-// }
