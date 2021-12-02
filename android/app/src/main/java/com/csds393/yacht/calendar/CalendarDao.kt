@@ -45,14 +45,17 @@ interface CalendarDao {
             getEventsStartingInDateWindow(earliest.toLocalDate(), latest.toLocalDate())
 
     @Query("SELECT * FROM normal_events WHERE id IN (SELECT eventID FROM event_task_table) ORDER BY endDate")
-    fun __getEventsWithTasksOrderedByEndDate(): List<CalendarEvent>
+    fun __getEventsWithSomeTasksOrderedByEndDate(): List<CalendarEvent>
 
     @Transaction
-    fun getTasksByDateMap(): Map<LocalDate, List<Task>> {
-        return __getEventsWithTasksOrderedByEndDate()
-                .associate {
-                    it.endDate to getTasksForEvent(it.id!!).filterNot { it.completed }
-                }.filterValues { it.isEmpty() }
+    fun getIncompleteTasksByDateMap(): Map<LocalDate, List<Task>> {
+        val events = __getEventsWithSomeTasksOrderedByEndDate()
+        return buildMap {
+            for (event in events) {
+                val tasks = getTasksForEvent(event.id!!).filterNot { it.completed }
+                merge(event.endDate, tasks) { old: List<Task>, new: List<Task> -> old + new }
+            }
+        }.filterValues { it.isEmpty() }
     }
 
     @Query("SELECT * FROM tasks WHERE taskID in (SELECT taskID FROM event_task_table WHERE eventID == :eventID)")

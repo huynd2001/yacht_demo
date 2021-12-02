@@ -619,10 +619,10 @@ public final class CalendarDao_Impl implements CalendarDao {
   }
 
   @Override
-  public Map<LocalDate, List<Task>> getTasksByDateMap() {
+  public Map<LocalDate, List<Task>> getIncompleteTasksByDateMap() {
     __db.beginTransaction();
     try {
-      Map<LocalDate, List<Task>> _result = CalendarDao.DefaultImpls.getTasksByDateMap(CalendarDao_Impl.this);
+      Map<LocalDate, List<Task>> _result = CalendarDao.DefaultImpls.getIncompleteTasksByDateMap(CalendarDao_Impl.this);
       __db.setTransactionSuccessful();
       return _result;
     } finally {
@@ -937,7 +937,7 @@ public final class CalendarDao_Impl implements CalendarDao {
   }
 
   @Override
-  public List<CalendarEvent> __getEventsWithTasksOrderedByEndDate() {
+  public List<CalendarEvent> __getEventsWithSomeTasksOrderedByEndDate() {
     final String _sql = "SELECT * FROM normal_events WHERE id IN (SELECT eventID FROM event_task_table) ORDER BY endDate";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
     __db.assertNotSuspendingTransaction();
