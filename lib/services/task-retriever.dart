@@ -3,19 +3,19 @@ import 'package:flutter/services.dart';
 import 'event-retriever.dart';
 
 class TaskItem {
-  final String name;
+  final String taskName;
   final bool isFinished;
   final int taskId;
 
-  const TaskItem._(this.name, this.isFinished, this.taskId);
+  const TaskItem._(this.taskName, this.isFinished, this.taskId);
 
   TaskItem.fromJson(Map<String, String> json)
-      : name = json['name'].toString(),
+      : taskName = json['taskName'].toString(),
         isFinished = (json['endTime'].toString().toLowerCase() == 'true'),
         taskId = int.parse(json['taskId'] ?? "-1");
 
   Map<String, String> toJson() => {
-        'name': name,
+        'name': taskName,
         'isFinished': isFinished.toString(),
         'taskId': taskId.toString(),
       };
@@ -57,14 +57,14 @@ class TaskRetriever {
     return eventsJson.map((e) => TaskItem.fromJson(e)).toList();
   }
 
-  static Future<void> createTask(EventItem e, String task) async {
+  static Future<void> createTask(EventItem e, String taskName) async {
     await taskRetriever.invokeMethod('createTask', <String, String>{
       'id': e.id.toString(),
       'start': e.startTime.toIso8601String(),
       'end': e.endTime.toIso8601String(),
       'label': e.label,
       'description': e.description,
-      'task': task
+      'name': taskName
     });
   }
 
@@ -75,8 +75,17 @@ class TaskRetriever {
       'end': e.endTime.toIso8601String(),
       'label': e.label,
       'description': e.description,
-      'task': taskItem.name,
+      'task': taskItem.taskName,
       'taskID': taskItem.taskId.toString()
     });
+  }
+
+  static Future<List<TaskItem>> getUnfinishedTask() async {
+    List<dynamic> tasks = await taskRetriever
+        .invokeMethod('getUnfinishedTasks', <String, String>{});
+    return tasks
+        .map((e) => Map<String, String>.from(e))
+        .map((e) => TaskItem.fromJson(e))
+        .toList();
   }
 }

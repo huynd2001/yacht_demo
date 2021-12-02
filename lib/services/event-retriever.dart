@@ -11,15 +11,15 @@ class EventItem {
       this.startTime, this.endTime, this.label, this.description, this.id);
 
   EventItem.fromJson(Map<String, String> json)
-      : startTime = DateTime.parse(json['startTime'].toString()),
-        endTime = DateTime.parse(json['endTime'].toString()),
+      : startTime = DateTime.parse(json['start'].toString()),
+        endTime = DateTime.parse(json['end'].toString()),
         description = json['description'].toString(),
         label = json['label'].toString(),
         id = int.parse(json['id'] ?? "-1");
 
   Map<String, String> toJson() => {
-        'startTime': startTime.toIso8601String(),
-        'endTime': endTime.toIso8601String(),
+        'start': startTime.toIso8601String(),
+        'end': endTime.toIso8601String(),
         'label': label,
         'description': description,
         'id': id.toString()

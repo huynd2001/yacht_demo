@@ -159,8 +159,8 @@ public class MainActivity extends FlutterActivity {
 
             result.success(events.stream().map(event -> {
                 Map<String, String> retMap = new HashMap<>();
-                retMap.put("startTime", event.getStartDate().atTime(event.getStartTime()).toString());
-                retMap.put("endTime", event.getEndDate().atTime(event.getEndTime()).toString());
+                retMap.put("start", event.getStartDate().atTime(event.getStartTime()).toString());
+                retMap.put("end", event.getEndDate().atTime(event.getEndTime()).toString());
                 retMap.put("label", event.getDetails().getLabel());
                 retMap.put("description", event.getDetails().getDescription());
                 retMap.put("id", Optional.ofNullable(event.getId()).orElse(-1L).toString());
