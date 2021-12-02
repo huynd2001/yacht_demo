@@ -49,13 +49,14 @@ interface CalendarDao {
 
     @Transaction
     fun getIncompleteTasksByDateMap(): Map<LocalDate, List<Task>> {
-        val events = __getEventsWithSomeTasksOrderedByEndDate()
         return buildMap {
+            val events = __getEventsWithSomeTasksOrderedByEndDate()
             for (event in events) {
                 val tasks = getTasksForEvent(event.id!!).filterNot { it.completed }
                 merge(event.endDate, tasks) { old: List<Task>, new: List<Task> -> old + new }
             }
-        }.filterValues { it.isNotEmpty() }
+            filterValues { it.isNotEmpty() }
+        }
     }
 
     @Query("SELECT * FROM tasks WHERE taskID in (SELECT taskID FROM event_task_table WHERE eventID == :eventID)")
