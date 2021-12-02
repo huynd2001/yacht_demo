@@ -9,7 +9,10 @@ import 'package:infinite_listview/infinite_listview.dart';
 class EventDisplay extends StatelessWidget {
   final EventItem event;
 
-  const EventDisplay({Key? key, required this.event}) : super(key: key);
+  final Function callback;
+
+  const EventDisplay({Key? key, required this.event, required this.callback})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,24 @@ class EventDisplay extends StatelessWidget {
                             .format(event.startTime) +
                         ' - ' +
                         DateFormat('h:mm a', 'en_US').format(event.endTime)),
-                  )
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      TextButton(
+                        child: const Text('MODIFY'),
+                        onPressed: () {
+                          this.callback();
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        child: const Text('TASKS'),
+                        onPressed: () {/* ... */},
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
                 ],
               ),
             ))
@@ -78,43 +98,49 @@ class _EventInDaysDisplayState extends State<EventInDaysDisplay> {
           child: ListView(
             addAutomaticKeepAlives: false,
             children: events
-                .map((e) => GestureDetector(
-                    child: EventDisplay(event: e),
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return EventEditor(
-                                event: e,
-                                saveCallback:
-                                    (start, end, label, description, id) {
-                                  if (start != null &&
-                                      end != null &&
-                                      start.isBefore(end)) {
-                                    EventRetriever.modifyEvent(
-                                        id, start, end, label, description);
-                                    this.setState(() {});
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('Event Modified!')),
-                                    );
-                                    Navigator.pop(context);
-                                    this.widget.changeCallBack();
-                                  }
-                                },
-                                removeCallback: (e) {
-                                  EventRetriever.removeEvent(e.id, e.startTime,
-                                      e.endTime, e.label, e.description);
-                                  this.setState(() {});
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Event Removed!')),
-                                  );
-                                  Navigator.pop(context);
-                                  this.widget.changeCallBack();
-                                });
-                          });
-                    }))
+                .map((e) => EventDisplay(
+                    event: e,
+                    callback: () => {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return EventEditor(
+                                    event: e,
+                                    saveCallback:
+                                        (start, end, label, description, id) {
+                                      if (start != null &&
+                                          end != null &&
+                                          start.isBefore(end)) {
+                                        EventRetriever.modifyEvent(
+                                            id, start, end, label, description);
+                                        this.setState(() {});
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text('Event Modified!')),
+                                        );
+                                        Navigator.pop(context);
+                                        this.widget.changeCallBack();
+                                      }
+                                    },
+                                    removeCallback: (e) {
+                                      EventRetriever.removeEvent(
+                                          e.id,
+                                          e.startTime,
+                                          e.endTime,
+                                          e.label,
+                                          e.description);
+                                      this.setState(() {});
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Event Removed!')),
+                                      );
+                                      Navigator.pop(context);
+                                      this.widget.changeCallBack();
+                                    });
+                              })
+                        }))
                 .toList(),
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),

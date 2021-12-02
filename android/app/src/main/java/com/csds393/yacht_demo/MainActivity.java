@@ -89,6 +89,7 @@ public class MainActivity extends FlutterActivity {
                             String id = call.argument("id");
                             String taskName = call.argument("taskName");
                             String taskId = call.argument("taskId");
+                            String finished = call.argument("isFinished");
                             String start = call.argument("start");
                             String end = call.argument("end");
                             String label = call.argument("label");
@@ -97,10 +98,10 @@ public class MainActivity extends FlutterActivity {
                                 case "getTasks":
                                     new TaskTask.GetTaskTask(parseLong(id).orElse(-1L), result).execute(1);
                                     break;
-                                case "finishTask":
-                                    new TaskTask.TickTaskTask(true, taskName, parseLong(taskId).orElse(-1L), result).execute(parseInt(id).orElse(-1));
+                                case "tickTask":
+                                    new TaskTask.TickTaskTask(finished.equals(true), taskName, parseLong(taskId).orElse(-1L), result).execute(parseInt(id).orElse(-1));
                                     break;
-                                case "createEvent":
+                                case "createTask":
                                     new TaskTask.CreateTaskTask(taskName, parseLong(id).orElse(-1L), result).execute(1);
                                     break;
                                 default:

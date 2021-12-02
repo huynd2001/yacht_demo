@@ -22,7 +22,9 @@ class TaskItem {
 
   @override
   bool operator ==(other) {
-    return (other is TaskItem) && (other.taskId == taskId);
+    return (other is TaskItem) &&
+        (other.taskId == taskId) &&
+        other.isFinished == isFinished;
   }
 
   @override
@@ -68,15 +70,16 @@ class TaskRetriever {
     });
   }
 
-  static Future<void> finishTask(EventItem e, TaskItem taskItem) async {
-    return await taskRetriever.invokeMethod('finishTask', <String, String>{
+  static Future<void> ticking(EventItem e, TaskItem taskItem) async {
+    return await taskRetriever.invokeMethod('tickTask', <String, String>{
       'id': e.id.toString(),
       'start': e.startTime.toIso8601String(),
       'end': e.endTime.toIso8601String(),
       'label': e.label,
       'description': e.description,
       'taskName': taskItem.taskName,
-      'taskId': taskItem.taskId.toString()
+      'taskId': taskItem.taskId.toString(),
+      'isFinished': (!taskItem.isFinished).toString()
     });
   }
 
