@@ -11,7 +11,7 @@ class TaskItem {
 
   TaskItem.fromJson(Map<String, String> json)
       : taskName = json['taskName'].toString(),
-        isFinished = (json['endTime'].toString().toLowerCase() == 'true'),
+        isFinished = (json['isFinished'].toString().toLowerCase() == 'true'),
         taskId = int.parse(json['taskId'] ?? "-1");
 
   Map<String, String> toJson() => {
