@@ -14,7 +14,6 @@ class WeatherRetriever {
       'start': start.toIso8601String(),
       'end': end.toIso8601String()
     });
-    print("kek lmao please look at this $results, between $start and $end");
     Map<String, String> weatherJsons = Map<String, String>.from(results);
     return WeatherItem.fromJson(weatherJsons);
   }

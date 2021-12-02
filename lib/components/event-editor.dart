@@ -102,7 +102,7 @@ class _EventEditorState extends State<EventEditor> {
                         // ignore: unnecessary_null_comparison
                         child: Text((formStartTime == null)
                             ? 'Start Date'
-                            : DateFormat("M-d").format(formStartTime!)),
+                            : DateFormat("MM-dd").format(formStartTime!)),
                       ),
                     ),
                     Container(
@@ -153,7 +153,7 @@ class _EventEditorState extends State<EventEditor> {
                         },
                         child: Text((formEndTime == null)
                             ? 'End Date'
-                            : DateFormat("M-d").format(formEndTime!)),
+                            : DateFormat("MM-dd").format(formEndTime!)),
                       ),
                     ),
                     Container(
@@ -187,8 +187,11 @@ class _EventEditorState extends State<EventEditor> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        ElevatedButton(
-                          child: Text("Save"),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                              primary: Colors.white,
+                              backgroundColor: Colors.green),
+                          child: Text("SAVE"),
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
@@ -201,8 +204,11 @@ class _EventEditorState extends State<EventEditor> {
                             }
                           },
                         ),
-                        ElevatedButton(
-                            child: Text("Remove"),
+                        TextButton(
+                            style: TextButton.styleFrom(
+                                primary: Colors.white,
+                                backgroundColor: Colors.red),
+                            child: const Text("REMOVE"),
                             onPressed: () {
                               this.widget.removeCallback(this.widget.event);
                             }),

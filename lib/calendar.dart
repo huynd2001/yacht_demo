@@ -76,8 +76,8 @@ class _CalendarItemDisplayState extends State<CalendarItemDisplay> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
                   ListTile(
-                      title:
-                          Text(DateFormat('M-d').format(this.widget.startTime)),
+                      title: Text(
+                          DateFormat('MM-dd').format(this.widget.startTime)),
                       subtitle: Text(
                         DateFormat('EEE').format(this.widget.startTime),
                       ))

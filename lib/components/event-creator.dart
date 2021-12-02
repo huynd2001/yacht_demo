@@ -87,7 +87,7 @@ class _EventEditorState extends State<EventCreator> {
                         // ignore: unnecessary_null_comparison
                         child: Text((formStartTime == null)
                             ? 'Start Date'
-                            : DateFormat("M-d").format(formStartTime!)),
+                            : DateFormat("MM-dd").format(formStartTime!)),
                       ),
                     ),
                     Container(
@@ -138,7 +138,7 @@ class _EventEditorState extends State<EventCreator> {
                         },
                         child: Text((formEndTime == null)
                             ? 'End Date'
-                            : DateFormat("M-d").format(formEndTime!)),
+                            : DateFormat("MM-dd").format(formEndTime!)),
                       ),
                     ),
                     Container(
@@ -170,7 +170,7 @@ class _EventEditorState extends State<EventCreator> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
+                  child: TextButton(
                     child: Text("Submit"),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
