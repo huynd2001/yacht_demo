@@ -37,6 +37,7 @@ class _TaskListDisplayState extends State<TaskListDisplay> {
   List<TaskItem> tasks = List.empty(growable: true);
 
   gettingTasks() {
+    print("wtf bro");
     TaskRetriever.getTasks(widget.eventItem).then((value) => {
           if (!listEquals(tasks, value))
             {
@@ -50,17 +51,23 @@ class _TaskListDisplayState extends State<TaskListDisplay> {
   @override
   Widget build(BuildContext context) {
     gettingTasks();
-    return Row(
+    return Column(
       children: [
-        ListView(
-          children: tasks
-              .map((e) => TaskItemDisplay(
-                  taskItem: e,
-                  callback: (val) {
-                    setState(() {});
-                  }))
-              .toList(),
-          physics: NeverScrollableScrollPhysics(),
+        Container(
+          height: 300,
+          child: ListView(
+            shrinkWrap: true,
+            children: tasks
+                .map((e) => TaskItemDisplay(
+                    taskItem: e,
+                    callback: (val) {
+                      TaskRetriever.ticking(this.widget.eventItem, e);
+                      print(e.isFinished);
+                      this.setState(() {});
+                    }))
+                .toList(),
+            physics: NeverScrollableScrollPhysics(),
+          ),
         ),
         ElevatedButton(
             onPressed: () {
@@ -77,7 +84,7 @@ class _TaskListDisplayState extends State<TaskListDisplay> {
                     });
                   });
             },
-            child: Text('ADD EVENT')),
+            child: Text('ADD TASK')),
       ],
     );
   }

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:yacht_demo/components/event-editor.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
 import 'package:infinite_listview/infinite_listview.dart';
+import 'package:yacht_demo/task-list.dart';
 
 class EventDisplay extends StatelessWidget {
   final EventItem event;
@@ -44,7 +45,17 @@ class EventDisplay extends StatelessWidget {
                       const SizedBox(width: 8),
                       TextButton(
                         child: const Text('TASKS'),
-                        onPressed: () {/* ... */},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => Scaffold(
+                                    appBar: AppBar(
+                                        backgroundColor: Colors.blue,
+                                        title: const Text('Task List')),
+                                    body: TaskListDisplay(eventItem: event)),
+                              ));
+                        },
                       ),
                       const SizedBox(width: 8),
                     ],

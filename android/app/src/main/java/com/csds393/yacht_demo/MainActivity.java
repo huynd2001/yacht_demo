@@ -99,7 +99,7 @@ public class MainActivity extends FlutterActivity {
                                     new TaskTask.GetTaskTask(parseLong(id).orElse(-1L), result).execute(1);
                                     break;
                                 case "tickTask":
-                                    new TaskTask.TickTaskTask(finished.equals(true), taskName, parseLong(taskId).orElse(-1L), result).execute(parseInt(id).orElse(-1));
+                                    new TaskTask.TickTaskTask("true".equals(finished), taskName, parseLong(taskId).orElse(-1L), result).execute(1);
                                     break;
                                 case "createTask":
                                     new TaskTask.CreateTaskTask(taskName, parseLong(id).orElse(-1L), result).execute(1);

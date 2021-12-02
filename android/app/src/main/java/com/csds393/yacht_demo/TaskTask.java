@@ -90,7 +90,7 @@ public class TaskTask {
 
                 newMap.put("name", taskName);
                 newMap.put("completed", isCompleted.toString());
-                newMap.put("id", taskID.toString());
+                newMap.put("taskID", taskID.toString());
 
                 DB.getInstance()
                         .getCalendarDao()
