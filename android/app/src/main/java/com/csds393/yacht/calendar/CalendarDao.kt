@@ -55,7 +55,7 @@ interface CalendarDao {
                 val tasks = getTasksForEvent(event.id!!).filterNot { it.completed }
                 merge(event.endDate, tasks) { old: List<Task>, new: List<Task> -> old + new }
             }
-        }.filterValues { it.isEmpty() }
+        }.filterValues { it.isNotEmpty() }
     }
 
     @Query("SELECT * FROM tasks WHERE taskID in (SELECT taskID FROM event_task_table WHERE eventID == :eventID)")
