@@ -37,7 +37,6 @@ class _TaskListDisplayState extends State<TaskListDisplay> {
   List<TaskItem> tasks = List.empty(growable: true);
 
   gettingTasks() {
-    print("wtf bro");
     TaskRetriever.getTasks(widget.eventItem).then((value) => {
           if (!listEquals(tasks, value))
             {
@@ -62,7 +61,6 @@ class _TaskListDisplayState extends State<TaskListDisplay> {
                     taskItem: e,
                     callback: (val) {
                       TaskRetriever.ticking(this.widget.eventItem, e);
-                      print(e.isFinished);
                       this.setState(() {});
                     }))
                 .toList(),
