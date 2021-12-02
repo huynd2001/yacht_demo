@@ -5,25 +5,10 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
-import com.csds393.yacht.calendar.CalendarDao;
-import com.csds393.yacht.calendar.CalendarEvent;
 import com.csds393.yacht.database.DB;
 import com.csds393.yacht.settings.Settings;
-import com.csds393.yacht.weather.DayWeather;
-import com.csds393.yacht.weather.HalfDayWeather;
-import com.csds393.yacht.weather.Weather;
 
 import java.util.Optional;
-import java.util.Random;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -32,10 +17,20 @@ import io.flutter.plugin.common.MethodChannel;
 public class MainActivity extends FlutterActivity {
     private static final String WEATHER_CHANNEL = "calendar/weather";
     private static final String EVENTS_CHANNEL = "calendar/events";
+    private static final String TASKS_CHANNEL = "calendar/tasks";
+    private static final String RECUR_EVENTS_CHANNEL = "calendar/recur";
 
     public static Optional<Integer> parseInt(String toParse) {
         try {
             return Optional.of(Integer.parseInt(toParse));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Long> parseLong(String toParse) {
+        try {
+            return Optional.of(Long.parseLong(toParse));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -81,6 +76,32 @@ public class MainActivity extends FlutterActivity {
                                     break;
                                 case "createEvent":
                                     new EventTask.CreateEventTask(start, end, label, description, result).execute(1);
+                                    break;
+                                default:
+                                    ;
+                            }
+                        }
+                );
+
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), TASKS_CHANNEL)
+                .setMethodCallHandler(
+                        (call, result) -> {
+                            String id = call.argument("id");
+                            String taskName = call.argument("taskName");
+                            String taskId = call.argument("taskId");
+                            String start = call.argument("start");
+                            String end = call.argument("end");
+                            String label = call.argument("label");
+                            String description = call.argument("description");
+                            switch(call.method) {
+                                case "getTasks":
+                                    new TaskTask.GetTaskTask(parseLong(id).orElse(-1L), result).execute(1);
+                                    break;
+                                case "finishTask":
+                                    new TaskTask.TickTaskTask(true, taskName, parseLong(taskId).orElse(-1L), result).execute(parseInt(id).orElse(-1));
+                                    break;
+                                case "createEvent":
+                                    new TaskTask.CreateTaskTask(taskName, parseLong(id).orElse(-1L), result).execute(1);
                                     break;
                                 default:
                                     ;

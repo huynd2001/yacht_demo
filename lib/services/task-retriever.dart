@@ -15,7 +15,7 @@ class TaskItem {
         taskId = int.parse(json['taskId'] ?? "-1");
 
   Map<String, String> toJson() => {
-        'name': taskName,
+        'taskName': taskName,
         'isFinished': isFinished.toString(),
         'taskId': taskId.toString(),
       };
@@ -64,7 +64,7 @@ class TaskRetriever {
       'end': e.endTime.toIso8601String(),
       'label': e.label,
       'description': e.description,
-      'name': taskName
+      'taskName': taskName
     });
   }
 
@@ -75,8 +75,8 @@ class TaskRetriever {
       'end': e.endTime.toIso8601String(),
       'label': e.label,
       'description': e.description,
-      'task': taskItem.taskName,
-      'taskID': taskItem.taskId.toString()
+      'taskName': taskItem.taskName,
+      'taskId': taskItem.taskId.toString()
     });
   }
 
