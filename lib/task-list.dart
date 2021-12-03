@@ -65,7 +65,6 @@ class _TaskListDisplayState extends State<TaskListDisplay> {
                             this.setState(() {});
                           }))
                       .toList(),
-                  physics: NeverScrollableScrollPhysics(),
                 )
               : Text("You currently don't have any task for this event!"),
         ),
