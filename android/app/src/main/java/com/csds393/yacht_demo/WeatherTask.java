@@ -62,11 +62,10 @@ public class WeatherTask {
                     .map(DayWeather::getMorningWeather)
                     .findFirst().orElse(null);
 
-            Map<String, String> returnValue = new HashMap<>();
             if(weatherDate == null) {
-                result.error("Lmao", "Mo weather found", "lmao");
                 return ;
             }
+            Map<String, String> returnValue = new HashMap<>(5);
             returnValue.put("temp", String.valueOf(weatherDate.getTemperature()));
             returnValue.put("windSpeed", String.valueOf(weatherDate.getWindSpeed().getStart()));
 
