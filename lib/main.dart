@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:yacht_demo/services/event-retriever.dart';
+import 'package:yacht_demo/unfinished-task.dart';
 
 import 'calendar.dart';
 import 'weather.dart';
-import 'settings.dart';
 
 void main() {
   // Initialize the Events
@@ -42,7 +42,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     ListView(
       children: <Widget>[DateWidget(), WeatherWidget()],
     ),
-    SettingWidget(),
+    TasksWidget(),
   ];
 
   void _onItemTapped(int index) {
@@ -67,8 +67,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Setting',
+            icon: Icon(Icons.sticky_note_2_outlined),
+            label: 'Tasks',
           ),
         ],
         currentIndex: _selectedIndex,

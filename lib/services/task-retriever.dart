@@ -70,13 +70,8 @@ class TaskRetriever {
     });
   }
 
-  static Future<void> ticking(EventItem e, TaskItem taskItem) async {
+  static Future<void> ticking(TaskItem taskItem) async {
     return await taskRetriever.invokeMethod('tickTask', <String, String>{
-      'id': e.id.toString(),
-      'start': e.startTime.toIso8601String(),
-      'end': e.endTime.toIso8601String(),
-      'label': e.label,
-      'description': e.description,
       'taskName': taskItem.taskName,
       'taskId': taskItem.taskId.toString(),
       'isFinished': (!taskItem.isFinished).toString()

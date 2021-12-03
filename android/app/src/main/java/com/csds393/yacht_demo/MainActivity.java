@@ -50,7 +50,7 @@ public class MainActivity extends FlutterActivity {
                 if ("getWeather".equals(call.method)) {
                     String start = call.argument("start");
                     String end = call.argument("end");
-
+                    // Hardcoded Cleveland
                     new WeatherTask.GetWeatherTask(start, end, result).execute(new Pair<>(41.499321f, -81.694359f));
                 }
             }
@@ -103,6 +103,9 @@ public class MainActivity extends FlutterActivity {
                                     break;
                                 case "createTask":
                                     new TaskTask.CreateTaskTask(taskName, parseLong(id).orElse(-1L), result).execute(1);
+                                    break;
+                                case "getUnfinishedTasks":
+                                    new TaskTask.GetUnfinishedTaskTask(result).execute(1);
                                     break;
                                 default:
                                     ;
