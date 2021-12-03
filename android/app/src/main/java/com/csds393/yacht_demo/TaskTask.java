@@ -8,6 +8,8 @@ import com.csds393.yacht.database.DB;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,57 @@ public class TaskTask {
                 retMap.put("isFinished", String.valueOf(task.getCompleted()));
                 return retMap;
             }).collect(Collectors.toList()));
+        }
+    }
+
+    static class GetUnfinishedTaskTask extends AsyncTask<Integer, Integer, List<Task>> {
+
+        MethodChannel.Result result;
+
+        public GetUnfinishedTaskTask(MethodChannel.Result result){
+            super();
+            this.result = result;
+        }
+
+        protected List<Task> doInBackground(Integer... input) {
+            int count = input.length;
+
+            List<Task> tasks = new ArrayList<>();
+
+            for (int i = 0; i < count; i++) {
+
+                Map<String, String> newMap = new HashMap<>();
+
+                tasks.addAll(DB.getInstance()
+                        .getCalendarDao()
+                        .getIncompleteTasksByDateMap().entrySet()
+                        .stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .map(Map.Entry::getValue)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList()));
+
+                publishProgress((int) ((i / (float) count) * 100));
+                // Escape early if cancel() is called
+                if (isCancelled()) break;
+            }
+            return tasks;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+//            setProgressPercent(progress[0]);
+        }
+
+        protected void onPostExecute(List<Task> tasks) {
+
+            result.success(tasks.stream()
+                .map(task -> {
+                    Map<String, String> retMap = new HashMap<>();
+                    retMap.put("taskName", task.getName());
+                    retMap.put("taskId", String.valueOf(task.getTaskID()));
+                    retMap.put("isFinished", String.valueOf(task.getCompleted()));
+                    return retMap;
+                }).collect(Collectors.toList()));
         }
     }
 

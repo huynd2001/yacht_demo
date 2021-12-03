@@ -57,10 +57,10 @@ class _TaskListDisplayState extends State<TaskListDisplay> {
           child: ListView(
             shrinkWrap: true,
             children: tasks
-                .map((e) => TaskItemDisplay(
-                    taskItem: e,
+                .map((t) => TaskItemDisplay(
+                    taskItem: t,
                     callback: (val) {
-                      TaskRetriever.ticking(this.widget.eventItem, e);
+                      TaskRetriever.ticking(t);
                       this.setState(() {});
                     }))
                 .toList(),
