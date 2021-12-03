@@ -49,7 +49,10 @@ class _EventEditorState extends State<EventEditor> {
                     initialValue: formLabel,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Please enter the label!';
+                      }
+                      if (value.length > 10) {
+                        return 'Label should not exceed 10 characters!';
                       }
                       return null;
                     },
@@ -66,16 +69,13 @@ class _EventEditorState extends State<EventEditor> {
                   child: TextFormField(
                     initialValue: formDescription,
                     validator: (value) {
-                      if (value == null) {
-                        return 'Please enter some text';
-                      }
                       return null;
                     },
                     decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         labelText: 'Description'),
                     onSaved: (val) {
-                      this.formDescription = val!;
+                      this.formDescription = (val == null) ? "" : val;
                       val = "";
                     },
                   ),
