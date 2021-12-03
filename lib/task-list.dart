@@ -54,18 +54,20 @@ class _TaskListDisplayState extends State<TaskListDisplay> {
       children: [
         Container(
           height: 300,
-          child: ListView(
-            shrinkWrap: true,
-            children: tasks
-                .map((t) => TaskItemDisplay(
-                    taskItem: t,
-                    callback: (val) {
-                      TaskRetriever.ticking(t);
-                      this.setState(() {});
-                    }))
-                .toList(),
-            physics: NeverScrollableScrollPhysics(),
-          ),
+          child: (!tasks.isEmpty)
+              ? ListView(
+                  shrinkWrap: true,
+                  children: tasks
+                      .map((t) => TaskItemDisplay(
+                          taskItem: t,
+                          callback: (val) {
+                            TaskRetriever.ticking(t);
+                            this.setState(() {});
+                          }))
+                      .toList(),
+                  physics: NeverScrollableScrollPhysics(),
+                )
+              : Text("You currently don't have any task for this event!"),
         ),
         ElevatedButton(
             onPressed: () {

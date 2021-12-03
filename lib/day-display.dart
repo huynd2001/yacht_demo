@@ -15,6 +15,17 @@ class EventDisplay extends StatelessWidget {
   const EventDisplay({Key? key, required this.event, required this.callback})
       : super(key: key);
 
+  static String _eventRange(DateTime startTime, DateTime endTime) {
+    return DateFormat('h:mm a', 'en_US').format(startTime) +
+        ' - ' +
+        DateFormat('h:mm a', 'en_US').format(endTime) +
+        ((startTime.day == endTime.day &&
+                startTime.month == endTime.month &&
+                startTime.year == endTime.year)
+            ? ""
+            : ' (+${DateTime(endTime.year, endTime.month, endTime.day).difference(DateTime(startTime.year, startTime.month, startTime.day)).inDays} days)');
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Stack(
@@ -28,11 +39,9 @@ class EventDisplay extends StatelessWidget {
                   ListTile(
                     leading: Icon(Icons.lightbulb),
                     title: Text(event.label),
-                    subtitle: Text(DateFormat('h:mm a', 'en_US')
-                            .format(event.startTime) +
-                        ' - ' +
-                        DateFormat('h:mm a', 'en_US').format(event.endTime)),
+                    subtitle: Text(_eventRange(event.startTime, event.endTime)),
                   ),
+                  Text(event.description),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
