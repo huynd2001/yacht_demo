@@ -52,16 +52,13 @@ class _EventEditorState extends State<EventCreator> {
                   padding: EdgeInsets.all(8.0),
                   child: TextFormField(
                     validator: (value) {
-                      if (value == null) {
-                        return 'Please enter some text';
-                      }
                       return null;
                     },
                     decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         labelText: 'Description'),
                     onSaved: (val) {
-                      this.formDescription = val!;
+                      this.formDescription = (val == null) ? "" : val;
                     },
                   ),
                 ),

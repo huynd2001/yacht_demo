@@ -51,9 +51,6 @@ class _EventEditorState extends State<EventEditor> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter the label!';
                       }
-                      if (value.length > 10) {
-                        return 'Label should not exceed 10 characters!';
-                      }
                       return null;
                     },
                     decoration: const InputDecoration(
